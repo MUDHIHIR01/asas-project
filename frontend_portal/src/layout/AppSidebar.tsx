@@ -4,15 +4,11 @@ import { Link, useLocation } from "react-router";
 import axiosInstance from "../axios"; 
 
 import {
-
   ChevronDownIcon,
   HorizontaLDots,
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 import SidebarWidget from "./SidebarWidget";
-
-
-
 
 type NavItem = {
   name: string;
@@ -26,8 +22,8 @@ const getNavItemsForRole = (roleId: number) => {
   const baseNavItems: NavItem[] = [
     {
       icon: (
-        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-pink-500 text-white">
-          📋
+        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-500 text-white">
+          📊 {/* Chart icon for dashboard */}
         </span>
       ),
       name: "Dashboard",
@@ -35,120 +31,131 @@ const getNavItemsForRole = (roleId: number) => {
     },
     {
       icon: (
-        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-500 text-white">
-          👤
+        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-indigo-500 text-white">
+          👤 {/* User icon for profile */}
         </span>
       ),
       name: "User Profile",
       path: "/profile",
     },
-    
   ];
-
+  
   const role1NavItems: NavItem[] = [
     ...baseNavItems,
     {
       name: "UserRoles",
       icon: (
-        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-500 text-white">
-          🛡️
+        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-purple-500 text-white">
+          🛡️ {/* Shield icon for roles/authority */}
         </span>
-      ), // Shield icon for authority/management
+      ),
       subItems: [{ name: "Manage roles", path: "/user-roles" }],
-    },    
-  
+    },
+    {
+      name: "Items",
+      icon: (
+        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-orange-500 text-white">
+          📦 {/* Box icon for items */}
+        </span>
+      ),
+      subItems: [{ name: "Manage Items", path: "/items" }],
+    },
     {
       name: "Users",
       icon: (
-        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-indigo-500 text-white">
-          👥
+        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-teal-500 text-white">
+          👥 {/* Group icon for users/community */}
         </span>
-      ), // Indigo for users (community/people)
+      ),
       subItems: [{ name: "Manage users", path: "/users" }],
     },
     {
       name: "UserLogs",
       icon: (
-        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-yellow-500 text-white">
-          📜
+        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-amber-500 text-white">
+          📜 {/* Scroll icon for logs/history */}
         </span>
-      ), // Yellow for logs (visibility/history)
+      ),
       subItems: [{ name: "View logs", path: "/user-logs" }],
     },
     {
-      name: "Ad-slots",
+      name: "Questions",
       icon: (
-        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-orange-500 text-white">
-          📢
+        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-pink-500 text-white">
+          ❓ {/* Question mark icon for questions */}
         </span>
-      ), // Megaphone icon for advertising
-      subItems: [{ name: "Manage Ad-slots", path: "/ad-slots" }],
+      ),
+      subItems: [{ name: "Manage Questions", path: "/questions" }],
     },
     {
-      name: "Bookings",
-      icon: (
-        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-orange-500 text-white">
-          📅
-        </span>
-      ), // Calendar icon for bookings
-      subItems: [{ name: "Manage bookings", path: "/bookings" }],
-    },
-    {
-      name: "Invoices",
-      icon: (
-        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-purple-500 text-white">
-          📄
-        </span>
-      ), // Document icon for invoices
-      subItems: [{ name: "View invoices", path: "/view-invoices" }],
-    },
-    {
-      name: "Payments",
+      name: "Answers",
       icon: (
         <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white">
-          💳
+          ✅ {/* Checkmark icon for answers */}
         </span>
-      ), // Credit card icon for payments
-      subItems: [{ name: "Manage payments", path: "/payments" }],
+      ),
+      subItems: [{ name: "Manage Answers", path: "/answers" }],
     },
-  
+    {
+      name: "Print Report",
+      icon: (
+        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-500 text-white">
+          📄 {/* Document icon for reports */}
+        </span>
+      ),
+      subItems: [
+        { name: "Questions Report", path: "/question-report" },
+        { name: "Answers Report", path: "/answer-report" },
+      ],
+    }
   ];
-
-
 
   const role2NavItems: NavItem[] = [
     ...baseNavItems,
     {
-      name: "Bookings",
+      name: "Questions",
       icon: (
-        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-orange-500 text-white">
-          📅
+        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-pink-500 text-white">
+          ❓ {/* Question mark icon for questions */}
         </span>
-      ), // Calendar icon for bookings
-      subItems: [{ name: "View bookings", path: "/user/bookings" }],
+      ),
+      subItems: [{ name: "Attempt Questions", path: "/attemp-questions" }],
     },
     {
-      name: "Invoices",
-      icon: (
-        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-purple-500 text-white">
-          📄
-        </span>
-      ), // Document icon for invoices
-      subItems: [{ name: "View invoices", path: "/user/invoices" }],
-    },
-    {
-      name: "Payments",
+      name: "Answers",
       icon: (
         <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white">
-          💳
+          ✅ {/* Checkmark icon for answers */}
         </span>
-      ), // Credit card icon for payments
-      subItems: [{ name: "View payments", path: "/view-payments" }],
+      ),
+      subItems: [{ name: "View Answers", path: "/view-answers" }],
     },
-    
+    {
+      name: "Print Report",
+      icon: (
+        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-500 text-white">
+          📄 {/* Document icon for reports */}
+        </span>
+      ),
+      subItems: [
+        { name: "Questions Report", path: "/question-report-v1" },
+        { name: "Answers Report", path: "/answer-report-v2" },
+      ],
+    }
   ];
 
-
+  const role3NavItems: NavItem[] = [
+    ...baseNavItems,
+    {
+      name: "KIP Results",
+      icon: (
+        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-cyan-500 text-white">
+          🏆 {/* Trophy icon for results */}
+        </span>
+      ),
+      subItems: [{ name: "View KIP Results", path: "/kip-results" }],
+    },
+  ];
 
   switch (roleId) {
     case 1:
@@ -157,14 +164,14 @@ const getNavItemsForRole = (roleId: number) => {
     case 2:
       console.log('Returning role2NavItems');
       return role2NavItems;
+    case 3:
+      console.log('Returning role3NavItems');
+      return role3NavItems;
     default:
       console.log('Returning baseNavItems');
       return baseNavItems;
   }
 };
-
-
-
 
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
@@ -389,7 +396,7 @@ const AppSidebar: React.FC = () => {
     return (
       <aside className="fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 shadow-lg w-[290px]">
         <div className="py-8 flex justify-start">
-          <h1>Digital Ad-Slot Portal</h1>
+          <h1>ASAS</h1>
         </div>
         <div>Loading sidebar...</div>
       </aside>
@@ -419,11 +426,11 @@ const AppSidebar: React.FC = () => {
         <Link to="/dashboard">
           {isExpanded || isHovered || isMobileOpen ? (
             <>
-              <h1 className="dark:hidden shadow-sm">Digital Ad-Slot Portal</h1>
-              <h1 className="hidden dark:block shadow-sm">Digital Ad-Slot Portal</h1>
+              <h1 className="dark:hidden shadow-sm">ASAS</h1>
+              <h1 className="hidden dark:block shadow-sm">ASAS</h1>
             </>
           ) : (
-            <h1>Digital Ad-Slot Portal</h1>
+            <h1>ASAS</h1>
           )}
         </Link>
       </div>

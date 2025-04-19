@@ -11,7 +11,8 @@ class CreateQuestionsTable extends Migration
         Schema::create('questions', function (Blueprint $table) {
             $table->id('question_id'); // Primary key
             $table->unsignedBigInteger('item_id'); // Foreign key to items
-            $table->json('question_category'); // JSON array for multiple categories
+            $table->json('question_category');
+            $table->string('status')->default('pending');
             $table->timestamps();
 
             // Foreign key constraint

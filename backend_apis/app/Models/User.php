@@ -14,7 +14,7 @@ class User extends Authenticatable
     protected $primaryKey = 'user_id';
 
     protected $fillable = [
-       'name',
+        'name',
         'role_id',
         'status',
         'nida',
@@ -26,8 +26,6 @@ class User extends Authenticatable
         'item_id',
         'email',
         'password',
-
-       
     ];
 
     protected $hidden = [
@@ -45,12 +43,8 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class, 'role_id', 'role_id');
     }
 
-
     public function item()
     {
-        return $this->hasMany(Answer::class, 'item_id', 'item_id');
+        return $this->belongsTo(Item::class, 'item_id', 'item_id');
     }
-
-   
-  
 }

@@ -21,7 +21,10 @@ class AnswerController extends Controller
     public function index()
     {
         try {
-            $answers = Answer::with(['user', 'question'])->orderBy('answer_id', 'desc')->get();
+            $answers = Answer::with(['user', 'question' => function ($query) {
+                $query->leftJoin('items', 'questions.item_id', '=', 'items.item_id')
+                      ->select('questions.*', 'items.item_category');
+            }])->orderBy('answer_id', 'desc')->get();
             return response()->json([
                 'answers' => $answers,
                 'message' => 'Answers retrieved successfully.'
@@ -34,6 +37,32 @@ class AnswerController extends Controller
             ], 500);
         }
     }
+    
+    public function loggedUserAnswers()
+    {
+        try {
+            $userId = Auth::id();
+            $answers = Answer::with(['user', 'question' => function ($query) {
+                $query->leftJoin('items', 'questions.item_id', '=', 'items.item_id')
+                      ->select('questions.*', 'items.item_category');
+            }])
+                ->where('logged-user_id', $userId)
+                ->orderBy('answer_id', 'desc')
+                ->get();
+            
+            return response()->json([
+                'answers' => $answers,
+                'message' => 'User answers retrieved successfully.'
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Error fetching user answers: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to fetch user answers.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
 
     /**
      * Show the form for creating a new answer (optional for API).
@@ -58,27 +87,19 @@ class AnswerController extends Controller
             'category_answers.*.answer' => 'required|string',
             'total_marks' => 'required|integer|min:1',
         ]);
-
+    
         if ($validator->fails()) {
             return response()->json([
                 'message' => 'Validation failed.',
                 'errors' => $validator->errors()
             ], 422);
         }
-
+    
         try {
-            // Ensure the authenticated user matches the provided user_id
-            $authUser = Auth::user();
-            if ($authUser->user_id != $request->user_id) {
-                return response()->json([
-                    'message' => 'Unauthorized: Provided user_id does not match authenticated user.'
-                ], 403);
-            }
-
             // Fetch the question to validate question_category
             $question = Question::find($request->question_id);
             $questionCategories = $question->question_category;
-
+    
             // Validate that category_answers match the question's question_category
             $submittedCategories = collect($request->category_answers)->pluck('category')->toArray();
             if (!empty(array_diff($submittedCategories, $questionCategories)) || !empty(array_diff($questionCategories, $submittedCategories))) {
@@ -86,32 +107,40 @@ class AnswerController extends Controller
                     'message' => 'Category answers must match the question\'s categories: ' . implode(', ', $questionCategories)
                 ], 422);
             }
-
+    
+            // Ensure authenticated user exists
+            if (!auth()->check()) {
+                return response()->json([
+                    'message' => 'Unauthorized. No authenticated user found.'
+                ], 401);
+            }
+    
             $answerData = [
-                'user_id' => $request->user_id,
+                'user_id' => $request->user_id, // Use provided user_id
                 'question_id' => $request->question_id,
                 'category_answers' => $request->category_answers,
                 'marks_scored' => null,
                 'total_marks' => $request->total_marks,
+                'logged-user_id' => auth()->user()->user_id, // Use correct column name with hyphen
             ];
-
+    
             $answer = Answer::create($answerData);
-
+    
             // Find users to notify (e.g., users related to the question's item_id)
             $question = Question::find($request->question_id);
             $users = User::where('item_id', $question->item_id)->get();
-
+    
             // Send email notification to each matched user
             foreach ($users as $user) {
                 // Generate login link
                 $loginLink = url('http://localhost:5173/'); // Adjust URL as needed
-
+    
                 // Prepare email content
                 $emailBody = "Dear {$user->name},\n\n" .
                              "New KPI Performances have been posted to your account. Please log in to review:\n" .
                              "{$loginLink}\n\n" .
                              "Thank you!";
-
+    
                 // Attempt to send email
                 try {
                     Mail::raw($emailBody, function ($message) use ($user) {
@@ -123,7 +152,7 @@ class AnswerController extends Controller
                     // Continue with the next user
                 }
             }
-
+    
             return response()->json([
                 'answer' => $answer,
                 'message' => 'Answer created successfully. Notifications sent to relevant users.'
@@ -137,6 +166,7 @@ class AnswerController extends Controller
         }
     }
 
+    
     /**
      * Display the specified answer.
      */

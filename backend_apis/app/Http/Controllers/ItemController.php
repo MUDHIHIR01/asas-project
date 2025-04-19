@@ -185,4 +185,23 @@ class ItemController extends Controller
             ], 500);
         }
     }
+
+
+    public function ItemDropDown(Request $request)
+{
+    try {
+        $query = Item::select('item_id', 'item_category')->distinct('item_category');
+        
+        if ($request->has('item_id')) {
+            $query->where('item_id', $request->item_id);
+        }
+        
+        $categories = $query->get();
+        return response()->json($categories, 200);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'Failed to fetch dropdown options'], 500);
+    }
+}
+
+    
 }

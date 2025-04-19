@@ -33,6 +33,36 @@ class QuestionController extends Controller
         }
     }
 
+
+    public function LoggedUserItem()
+    {
+        try {
+            $user = auth()->user(); // Get the logged-in user
+            if (!$user) {
+                return response()->json([
+                    'message' => 'Unauthorized. Please log in.'
+                ], 401);
+            }
+    
+            $questions = Question::with('item')
+                ->where('item_id', $user->item_id) // Match questions with user's item_id
+                ->where('status', 'pending') // Filter for pending status
+                ->orderBy('question_id', 'desc')
+                ->get();
+    
+            return response()->json([
+                'questions' => $questions,
+                'message' => 'Pending questions for logged-in user retrieved successfully.'
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Error fetching pending questions for logged-in user: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to fetch pending questions.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     /**
      * Show the form for creating a new question (optional for API).
      */

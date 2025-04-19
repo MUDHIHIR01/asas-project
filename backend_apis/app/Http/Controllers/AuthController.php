@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Department;
 use App\Models\Role;
+use App\Models\Item;
 use App\Models\Cookie;
 use App\Models\UserLog;
 use Illuminate\Http\Request;
@@ -203,26 +204,28 @@ class AuthController extends Controller
         return response()->json(['message' => 'Logged out successfully'])->cookie($cookie);
     }
 
-    public function getLoggedUserProfile(Request $request)
-    {
-        // Eager load the 'role' relationship
-        $user = $request->user()->load(['role']);
 
-        return response()->json([
-            'user_id' => $user->user_id,
-            'name' => $user->name,
-            'role_id' => $user->role_id,
-            'status' => $user->status,
-            'nida' => $user->nida,
-            'address' => $user->address,
-            'sex' => $user->sex,
-            'date_of_birth' => $user->date_of_birth,
-            'contact' => $user->contact,
-            'auto_number' => $user->auto_number,
-            'item_id' => $user->item_id,
-            'email' => $user->email,
-        ]);
-    }
+    public function getLoggedUserProfile(Request $request)
+{
+    // Eager load the 'role' and 'item' relationships
+    $user = $request->user()->load(['role', 'item']);
+
+    return response()->json([
+        'user_id' => $user->user_id,
+        'name' => $user->name,
+        'role_id' => $user->role_id,
+        'category' => $user->role->category ?? null, // Fetch role category
+        'status' => $user->status,
+        'nida' => $user->nida,
+        'address' => $user->address,
+        'sex' => $user->sex,
+        'date_of_birth' => $user->date_of_birth,
+        'contact' => $user->contact,
+        'auto_number' => $user->auto_number,
+        'item_category' => $user->item->category ?? null, // Fetch item category
+        'email' => $user->email,
+    ]);
+}
 
     public function getLoggedUserName(Request $request)
     {
@@ -320,6 +323,7 @@ class AuthController extends Controller
                              'item_id' => $user->item_id,
                              'email' => $user->email,
                              'role' => optional($user->role)->category,
+                             'created_at' => $user->created_at,
                          ];
                      });
 
@@ -333,6 +337,31 @@ class AuthController extends Controller
             return response()->json(['error' => 'Failed to fetch users.'], 500);
         }
     }
+
+
+
+    public function getUsersForDropdown(Request $request)
+    {
+        try {
+            // Fetch users with role_id = 3, selecting only user_id and name
+            $users = User::select('user_id', 'name')
+                         ->where('role_id', 3)
+                         ->orderBy('name', 'asc')
+                         ->get()
+                         ->map(function ($user) {
+                             return [
+                                 'user_id' => $user->user_id,
+                                 'name' => $user->name,
+                             ];
+                         });
+
+            return response()->json(['users' => $users], 200);
+        } catch (\Exception $e) {
+            \Log::error('Error fetching users for dropdown: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to fetch users for dropdown.'], 500);
+        }
+    }
+
 
     public function showUserById($user_id)
     {

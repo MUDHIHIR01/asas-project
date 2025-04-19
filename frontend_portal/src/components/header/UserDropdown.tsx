@@ -60,7 +60,7 @@ export default function UserDropdown() {
 
       // Close dropdown and redirect to signin
       closeDropdown();
-      navigate('/sign-in');
+      navigate('/');
     } catch (err) {
       const error = err;
       toast.error(error.response?.data?.message || "Logout failed", {

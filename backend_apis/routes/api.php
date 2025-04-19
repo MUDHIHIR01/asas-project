@@ -23,7 +23,7 @@ Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/auth/logout', [AuthController::class, 'logout']);
 Route::post('/auth/request-reset', [PasswordResetController::class, 'requestPasswordReset']);
 Route::post('/auth/password-reset', [PasswordResetController::class, 'resetPassword']);
-Route::get('/ad-slots_v1', [AdSlotController::class, 'indexV1']);
+
 
 
 // Protected Routes
@@ -38,7 +38,7 @@ Route::middleware(['auth:sanctum', 'token.expiration'])->group(function () {
     Route::post('/update-profile', [AuthController::class, 'updateProfile']);
     Route::get('/count/users', [AuthController::class, 'countUsers']);
     Route::get('/logged-user/name', [AuthController::class, 'getLoggedUserName']);
-
+    Route::get('/user-dropdown', [AuthController::class, 'getUsersForDropdown']);
 
 
     // Route to show a specific user by user_id
@@ -61,13 +61,13 @@ Route::middleware(['auth:sanctum', 'token.expiration'])->group(function () {
 
 // items
 Route::resource('items', ItemController::class);
-
+Route::get('item/by-dropdown', [ItemController::class, 'ItemDropDown']);
 
 //questions 
 Route::resource('questions', QuestionController::class);
-
+Route::get('/logged-user/questions', [QuestionController::class, 'LoggedUserItem']);
     
 //answers
 Route::resource('answers', AnswerController::class);
-
+Route::get('/logged/user-answers', [AnswerController::class, 'loggedUserAnswers']);
 });

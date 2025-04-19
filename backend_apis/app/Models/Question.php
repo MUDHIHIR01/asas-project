@@ -14,6 +14,7 @@ class Question extends Model
     protected $fillable = [
         'item_id',
         'question_category',
+        'status'
     ];
 
     protected $casts = [
@@ -23,5 +24,11 @@ class Question extends Model
     public function item()
     {
         return $this->belongsTo(Item::class, 'item_id', 'item_id');
+    }
+
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
 }

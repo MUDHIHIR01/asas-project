@@ -27,19 +27,15 @@ import Users from "./pages/users/Users";
 import CreateUser from "./pages/users/CreateUser";
 import EditUser from "./pages/users/EditUser";
 import UserLogs from "./pages/userlogs/UserLogs";
-import HomePage from './pages/HomePage';
-import Contact from './pages/Contact'
-import About from "./pages/About";
-import  ProcessedSlotsPage from './components/main/ProcessedSlotsPage'
 import { ReactNode } from "react";
-import UserBookings from './components/main/UserBookings'
-import UserInvoices from './components/main/UserInvoices'
-import  Bookings from './pages/bookings/Bookings'
-import  ConfirmBooking from './pages/bookings/ConfirmBooking'
-import  AllInvoices from './pages/invoices/AllInvoices'
-import  Adslots from './pages/ad_losts/Adslots'
-import  CreateAdSlot from './pages/ad_losts/CreateAdSlot'
-import  EditAdSlot from  './pages/ad_losts/EditAdSlot'
+import CreateItem from "./pages/items/CreateItem";
+import Items from "./pages/items/Items";
+import EditItem from "./pages/items/EditItem";
+import  Questions   from  './pages/questions/Questions'
+import  EditQuestion  from  './pages/questions/EditQuestion'
+import  CreateQuestion  from  './pages/questions/CreateQuestion'
+import  AttemptQuestions  from './pages/questions/AttemptQuestions'
+import  Answerrs  from  './pages/answers/Answerrs'
 
 // Define props for ProtectedRoute
 interface ProtectedRouteProps {
@@ -154,45 +150,11 @@ export default function App() {
 
 />
 
-
 <Route
-  path="/processed-slots"
+  path="/create-item"
   element={
     <ProtectedRoute>
-      <ProcessedSlotsPage />
-    </ProtectedRoute>
-  }
-
-/>
-
-
-
-
-<Route
-  path="/user/bookings"
-  element={
-    <ProtectedRoute>
-      <UserBookings />
-    </ProtectedRoute>
-  }
-
-/>
-
-<Route
-  path="/user/invoices"
-  element={
-    <ProtectedRoute>
-      <UserInvoices />
-    </ProtectedRoute>
-  }
-
-/>
-
-<Route
-  path="/bookings"
-  element={
-    <ProtectedRoute>
-      <Bookings />
+      <CreateItem />
     </ProtectedRoute>
   }
 
@@ -200,20 +162,10 @@ export default function App() {
 
 
 <Route
-  path="/confirm-booking/:bookId"
+  path="/items"
   element={
     <ProtectedRoute>
-      <ConfirmBooking />
-    </ProtectedRoute>
-  }
-/>
-
-
-<Route
-  path="/view-invoices"
-  element={
-    <ProtectedRoute>
-      <AllInvoices />
+      <Items />
     </ProtectedRoute>
   }
 
@@ -221,35 +173,68 @@ export default function App() {
 
 
 <Route
-  path="/ad-slots"
+  path="/edit-item/:itemId"
   element={
     <ProtectedRoute>
-      <Adslots />
+      <EditItem />
+    </ProtectedRoute>
+  }
+/>
+
+
+
+<Route
+  path="/create-question"
+  element={
+    <ProtectedRoute>
+      <CreateQuestion />
+    </ProtectedRoute>
+  }
+
+/>
+
+
+<Route
+  path="/questions"
+  element={
+    <ProtectedRoute>
+      <Questions />
     </ProtectedRoute>
   }
 
 />
 
 <Route
-  path="/create/ad-slot"
+  path="/attemp-questions"
   element={
     <ProtectedRoute>
-      <CreateAdSlot />
+      <AttemptQuestions />
     </ProtectedRoute>
   }
 
 />
-
 
 
 <Route
-  path="/edit/ad-slot/:adslotId"
+  path="/edit-question/:questionId"
   element={
     <ProtectedRoute>
-      <EditAdSlot/>
+      <EditQuestion />
     </ProtectedRoute>
   }
 />
+
+
+<Route
+  path="/view-answers"
+  element={
+    <ProtectedRoute>
+      <Answerrs />
+    </ProtectedRoute>
+  }
+
+/>
+
 
             <Route
               path="/calendar"
@@ -358,10 +343,7 @@ export default function App() {
           </Route>
 
           {/* Public Routes - Auth Layout */}
-          <Route path="/" element={<HomePage />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact/>} />
-          <Route path="/sign-in" element={<SignIn />} />
+          <Route path="/" element={<SignIn />} />
           <Route path="/sign-up" element={<SignUp />} />
           <Route path="/reset-password" element={<ResetPass />} />
           <Route path="/request-for/reset-password" element={<RequestForResetPass/>} />

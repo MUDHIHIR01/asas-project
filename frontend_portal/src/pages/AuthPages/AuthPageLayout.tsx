@@ -21,12 +21,12 @@ export default function AuthLayout({
                 <img
                   width={231}
                   height={48}
-                  src="/logo1.png"
+                  src="/homeimg.png"
                   alt="Logo"
                 />
               </Link>
               <p className="text-center text-gray-400 dark:text-white/60">
-            Weclome to    Digital Ad-Slot Portal
+            Weclome To    Evaluation System
               </p>
             </div>
           </div>

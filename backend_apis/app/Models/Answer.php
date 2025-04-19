@@ -13,6 +13,7 @@ class Answer extends Model
 
     protected $fillable = [
         'user_id',
+        'logged-user_id',
         'question_id',
         'category_answers',
         'marks_scored',

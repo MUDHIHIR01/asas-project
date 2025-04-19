@@ -11,8 +11,15 @@ interface UserProfile {
   email: string;
   name: string;
   role_id: number;
-  category: string;
+  category: string | null;
   status: string;
+  nida: string;
+  address: string;
+  sex: string;
+  date_of_birth: string;
+  contact: string;
+  auto_number: string;
+  item_category: string | null;
 }
 
 export default function UserInfoCard() {
@@ -28,8 +35,8 @@ export default function UserInfoCard() {
     const fetchProfile = async () => {
       try {
         const response = await axiosInstance.get("/api/user/profile");
-        setUser(response.data); // Backend returns flat object
-        setEmail(response.data.email); // Pre-fill email field
+        setUser(response.data);
+        setEmail(response.data.email);
       } catch (err) {
         setModalMessage({ type: "error", text: "Unable to load user profile. Please try again later." });
       } finally {
@@ -40,9 +47,8 @@ export default function UserInfoCard() {
   }, []);
 
   const handleSave = async () => {
-    setModalMessage(null); // Clear previous messages
+    setModalMessage(null);
 
-    // Validation
     if (!email) {
       setModalMessage({ type: "error", text: "Email address cannot be empty" });
       return;
@@ -77,7 +83,6 @@ export default function UserInfoCard() {
     try {
       await axiosInstance.post("/api/update-profile", payload);
       setModalMessage({ type: "success", text: "Profile updated successfully!" });
-      // Update local user state with new email (password isn’t returned from backend)
       setUser((prev) => prev ? { ...prev, email } : null);
       setTimeout(() => {
         closeModal();
@@ -125,12 +130,40 @@ export default function UserInfoCard() {
             <p className="text-sm font-medium text-gray-800 dark:text-white/90">{user?.email || "N/A"}</p>
           </div>
           <div>
-            <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Role</p>
+            <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Role Category</p>
             <p className="text-sm font-medium text-gray-800 dark:text-white/90">{user?.category || "N/A"}</p>
+          </div>
+          <div>
+            <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Item Category</p>
+            <p className="text-sm font-medium text-gray-800 dark:text-white/90">{user?.item_category || "N/A"}</p>
           </div>
           <div>
             <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Status</p>
             <p className="text-sm font-medium text-gray-800 dark:text-white/90">{user?.status || "N/A"}</p>
+          </div>
+          <div>
+            <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">NIDA</p>
+            <p className="text-sm font-medium text-gray-800 dark:text-white/90">{user?.nida || "N/A"}</p>
+          </div>
+          <div>
+            <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Address</p>
+            <p className="text-sm font-medium text-gray-800 dark:text-white/90">{user?.address || "N/A"}</p>
+          </div>
+          <div>
+            <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Sex</p>
+            <p className="text-sm font-medium text-gray-800 dark:text-white/90">{user?.sex || "N/A"}</p>
+          </div>
+          <div>
+            <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Date of Birth</p>
+            <p className="text-sm font-medium text-gray-800 dark:text-white/90">{user?.date_of_birth || "N/A"}</p>
+          </div>
+          <div>
+            <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Contact</p>
+            <p className="text-sm font-medium text-gray-800 dark:text-white/90">{user?.contact || "N/A"}</p>
+          </div>
+          <div>
+            <p className="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Auto Number</p>
+            <p className="text-sm font-medium text-gray-800 dark:text-white/90">{user?.auto_number || "N/A"}</p>
           </div>
         </div>
         <button
