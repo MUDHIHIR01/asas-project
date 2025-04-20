@@ -35,7 +35,11 @@ import  Questions   from  './pages/questions/Questions'
 import  EditQuestion  from  './pages/questions/EditQuestion'
 import  CreateQuestion  from  './pages/questions/CreateQuestion'
 import  AttemptQuestions  from './pages/questions/AttemptQuestions'
-import  Answerrs  from  './pages/answers/Answerrs'
+import  Marks  from  './pages/marks/Marks'
+import  ViewMarks from './pages/marks/ViewMarks'
+import  Reports  from './pages/marks/Reports'
+import  ReportsV1  from './pages/marks/ReportsV1'
+import  UserMarks from './pages/marks/UserMarks'
 
 // Define props for ProtectedRoute
 interface ProtectedRouteProps {
@@ -229,11 +233,58 @@ export default function App() {
   path="/view-answers"
   element={
     <ProtectedRoute>
-      <Answerrs />
+      <Marks />
     </ProtectedRoute>
   }
 
 />
+
+
+<Route
+  path="/marks"
+  element={
+    <ProtectedRoute>
+      <ViewMarks />
+    </ProtectedRoute>
+  }
+
+/>
+
+<Route
+  path="/user-marks"
+  element={
+    <ProtectedRoute>
+      <UserMarks />
+    </ProtectedRoute>
+  }
+
+/>
+
+
+<Route
+  path="/reports"
+  element={
+    <ProtectedRoute>
+      <Reports />
+    </ProtectedRoute>
+  }
+
+/>
+
+<Route
+  path="/reports-v1"
+  element={
+    <ProtectedRoute>
+      <ReportsV1 />
+    </ProtectedRoute>
+  }
+
+/>
+
+
+
+
+
 
 
             <Route

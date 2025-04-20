@@ -64,6 +64,36 @@ class AnswerController extends Controller
     }
 
 
+    public function UserAnswers()
+{
+    try {
+        $userId = Auth::id();
+        $answers = Answer::with([
+            'user' => function ($query) {
+                $query->where('users.user_id', '=', Auth::id()); // Ensure user relation is correct
+            },
+            'question' => function ($query) {
+                $query->leftJoin('items', 'questions.item_id', '=', 'items.item_id')
+                      ->select('questions.*', 'items.item_category');
+            }
+        ])
+            ->where('answers.user_id', $userId) // Explicitly use answers.user_id
+            ->orderBy('answer_id', 'desc')
+            ->get();
+        
+        return response()->json([
+            'answers' => $answers,
+            'message' => 'User answers retrieved successfully.'
+        ], 200);
+    } catch (\Exception $e) {
+        Log::error('Error fetching user answers: ' . $e->getMessage());
+        return response()->json([
+            'message' => 'Failed to fetch user answers.',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
     /**
      * Show the form for creating a new answer (optional for API).
      */
@@ -310,6 +340,53 @@ class AnswerController extends Controller
             Log::error('Error deleting answer: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Failed to delete answer.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+    public function AnswersReport(Request $request)
+    {
+        try {
+            $query = Answer::with(['user', 'question' => function ($query) {
+                $query->leftJoin('items', 'questions.item_id', '=', 'items.item_id')
+                      ->select('questions.*', 'items.item_category');
+            }]);
+
+            // Filter by user_id if provided
+            if ($request->has('user_id') && !empty($request->user_id)) {
+                $query->where('user_id', $request->user_id);
+            }
+
+            // Filter by item_category if provided and not 'all'
+            if ($request->has('item_category') && !empty($request->item_category) && $request->item_category !== 'all') {
+                $query->whereHas('question', function ($q) use ($request) {
+                    $q->whereHas('item', function ($item) use ($request) {
+                        $item->where('item_category', $request->item_category);
+                    });
+                });
+            }
+
+            // Filter by date range if provided
+            if ($request->has('from_date') && !empty($request->from_date)) {
+                $query->whereDate('created_at', '>=', $request->from_date);
+            }
+            if ($request->has('to_date') && !empty($request->to_date)) {
+                $query->whereDate('created_at', '<=', $request->to_date);
+            }
+
+            // Order by created_at desc
+            $answers = $query->orderBy('created_at', 'desc')->get();
+
+            return response()->json([
+                'answers' => $answers,
+                'message' => 'Answers report retrieved successfully.'
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Error fetching answers report: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to fetch answers report.',
                 'error' => $e->getMessage()
             ], 500);
         }

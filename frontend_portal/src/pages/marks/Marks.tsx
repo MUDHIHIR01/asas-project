@@ -34,9 +34,8 @@ interface Answer {
 }
 
 interface GroupedAnswers {
-  item_category: string;
   user: User;
-  answers: Answer[];
+  answersByCategory: { [key: string]: { answers: Answer[] } };
 }
 
 const UserAnswers: React.FC = () => {
@@ -46,7 +45,7 @@ const UserAnswers: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState<string>('');
 
-  // Fetch answers from /api/logged/user-answers
+  // Fetch answers from /api/answers and group by user and category
   useEffect(() => {
     const fetchAnswers = async () => {
       try {
@@ -54,24 +53,24 @@ const UserAnswers: React.FC = () => {
         const response = await axiosInstance.get<{ answers: Answer[] }>('/api/logged/user-answers');
         const answers = response.data.answers || [];
 
-        // Group answers by item_category and user
+        // Group answers by user and then by item_category
         const grouped = answers.reduce((acc: GroupedAnswers[], answer: Answer) => {
-          // Ensure question exists and handle null item_category
-          const item_category = answer.question?.item_category || 'Uncategorized';
           const user = answer.user || { user_id: 0, name: 'Unknown' };
-          const existingGroup = acc.find(
-            (group) => group.item_category === item_category && group.user.user_id === user.user_id
-          );
+          const item_category = answer.question?.item_category || 'Uncategorized';
+          let userGroup = acc.find((group) => group.user.user_id === user.user_id);
 
-          if (existingGroup) {
-            existingGroup.answers.push(answer);
-          } else {
-            acc.push({
-              item_category,
+          if (!userGroup) {
+            userGroup = {
               user,
-              answers: [answer],
-            });
+              answersByCategory: {},
+            };
+            acc.push(userGroup);
           }
+
+          if (!userGroup.answersByCategory[item_category]) {
+            userGroup.answersByCategory[item_category] = { answers: [] };
+          }
+          userGroup.answersByCategory[item_category].answers.push(answer);
 
           return acc;
         }, []);
@@ -91,14 +90,16 @@ const UserAnswers: React.FC = () => {
     fetchAnswers();
   }, []);
 
-  // Handle search by user.name or item_category
+  // Handle search by user.name and item_category
   useEffect(() => {
     const lowercasedSearch = search.toLowerCase();
-    const filtered = groupedAnswers.filter(
-      (group) =>
-        group.user.name.toLowerCase().includes(lowercasedSearch) ||
-        group.item_category.toLowerCase().includes(lowercasedSearch)
-    );
+    const filtered = groupedAnswers.filter((group) => {
+      const matchesUserName = group.user.name.toLowerCase().includes(lowercasedSearch);
+      const matchesCategory = Object.keys(group.answersByCategory).some((category) =>
+        category.toLowerCase().includes(lowercasedSearch)
+      );
+      return matchesUserName || matchesCategory;
+    });
     setFilteredAnswers(filtered);
   }, [search, groupedAnswers]);
 
@@ -156,7 +157,7 @@ const UserAnswers: React.FC = () => {
       />
       <div className="max-w-7xl mx-auto">
         <h2 className="text-4xl font-extrabold mb-10 text-gray-800 dark:text-white tracking-tight animate-fade-in">
-          Sellers Answer
+          Sellers Marks
         </h2>
         <div className="flex flex-col sm:flex-row justify-between items-center mb-10 gap-4">
           <div className="relative w-full sm:w-96">
@@ -190,38 +191,63 @@ const UserAnswers: React.FC = () => {
           <div className="flex flex-col gap-6">
             {filteredAnswers.map((group, index) => (
               <div
-                key={`${group.item_category}-${group.user.user_id}-${index}`}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 w-full transform hover:shadow-xl transition-all duration-300 animate-fade-in"
+                key={`user-${group.user.user_id}-${index}`}
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700 w-full transform hover:shadow-xl transition-all duration-300 animate-fade-in"
               >
                 <h3 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-4">
-                  {group.item_category}
+                  {group.user.name}
                 </h3>
-                <div className="mb-4">
-                  <p className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-                    Name: {group.user.name}
-                  </p>
-                </div>
                 <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                  {group.answers.map((answer) => (
-                    <div key={answer.answer_id} className="mb-4">
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        <strong>Categories:</strong>{' '}
-                        {answer.question?.question_category?.join(', ') || 'N/A'}
-                      </p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        <strong>Answers:</strong>{' '}
-                        {answer.category_answers
-                          ? answer.category_answers
-                              .map((ca) => `${ca.category}: ${ca.answer}`)
-                              .join('; ')
-                          : 'No answers provided'}
-                      </p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        <strong>Total Marks:</strong> {answer.total_marks ?? 'N/A'}
-                      </p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        <strong>Created At:</strong> {formatDate(answer.created_at)}
-                      </p>
+                  {Object.entries(group.answersByCategory).map(([category, { answers }], catIndex) => (
+                    <div key={`${category}-${catIndex}`} className="mb-4">
+                      <div className="mb-2">
+                        <h4 className="text-lg font-semibold text-silver-800 dark:text-gray-100">
+                          {category}
+                        </h4>
+                      </div>
+                      {answers.map((answer, answerIndex) => (
+                        <div key={answer.answer_id}>
+                          <div
+                            className="flex flex-row items-center gap-6 flex-wrap text-sm text-gray-600 dark:text-gray-400 mb-2"
+                          >
+                            <div className="min-w-[150px]  text-yellow-600 ">
+                              <strong>Category:</strong> {category}
+                            </div>
+                            <div className="min-w-[150px]">
+                              <strong>Questions:</strong>{' '}
+                              {answer.question?.question_category?.join(', ') || 'N/A'}
+                            </div>
+                            <div className="min-w-[200px]">
+                              <strong>Question Created At:</strong>{' '}
+                              <span className="text-red-600 font-medium">{formatDate(answer.question.created_at)}</span>
+                            </div>
+                            <div className="min-w-[200px] pr-4 border-r border-gray-300 dark:border-gray-600">
+                              <strong>Marks:</strong>{' '}
+                              {answer.category_answers
+                                ? answer.category_answers
+                                    .map((ca) => (
+                                      <span key={`${ca.category}-${ca.answer}`}>
+                                        {ca.category}: <span className="font-bold text-green-900">{ca.answer}</span>
+                                      </span>
+                                    ))
+                                    .reduce((prev, curr, i) => (i === 0 ? [curr] : [...prev, '; ', curr]), [] as React.ReactNode[])
+                                : 'No answers provided'}
+                            </div>
+                            <div className="flex items-center gap-6">
+                              <div className="min-w-[100px]">
+                                <strong>Total Marks:</strong> {answer.total_marks ?? 'N/A'}
+                              </div>
+                              <div className="text-sm text-green-600 font-medium">
+                                Marks Created At: {formatDate(answer.created_at)}
+                              </div>
+                            </div>
+                          </div>
+                          <hr className="my-2 border-t-2 border-blue-300" />
+                        </div>
+                      ))}
+                      {catIndex < Object.keys(group.answersByCategory).length - 1 && (
+                        <hr className="my-4 border-t-2 py-5 border-gray-900 dark:border-gray-600"  />
+                      )}
                     </div>
                   ))}
                 </div>

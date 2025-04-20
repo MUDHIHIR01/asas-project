@@ -152,7 +152,7 @@ export default function ResetPasswordForm() {
               
               <div className="text-center">
                 <Link 
-                  to="/sign-in" 
+                  to="/" 
                   className="text-sm text-blue-500 hover:underline dark:text-blue-400"
                 >
                   Back Home

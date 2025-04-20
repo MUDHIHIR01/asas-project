@@ -46,7 +46,8 @@ const AttemptQuestions: React.FC = () => {
   const [pageSize, setPageSize] = useState<number>(9);
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false); // New state for submission preloader
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
   const [formData, setFormData] = useState<FormData>({
     user_id: null,
     category_answers: [],
@@ -86,7 +87,7 @@ const AttemptQuestions: React.FC = () => {
         question.question_category.some((cat) => cat.toLowerCase().includes(lowercasedSearch))
     );
     setFilteredQuestions(filtered);
-    setCurrentPage(1); // Reset to first page on search
+    setCurrentPage(1);
   }, [search, questions]);
 
   // Pagination logic
@@ -170,7 +171,7 @@ const AttemptQuestions: React.FC = () => {
     }
 
     try {
-      setIsSubmitting(true); // Start preloader
+      setIsSubmitting(true);
       const payload = {
         user_id: formData.user_id,
         question_id: selectedQuestion.question_id,
@@ -194,7 +195,7 @@ const AttemptQuestions: React.FC = () => {
       const errorMessage = err.response?.data?.message || 'Failed to submit answers.';
       toast.error(errorMessage, { position: 'top-right' });
     } finally {
-      setIsSubmitting(false); // Stop preloader
+      setIsSubmitting(false);
     }
   };
 
@@ -221,7 +222,7 @@ const AttemptQuestions: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 p-6">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 p-4">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500 mx-auto mb-4"></div>
           <p className="text-gray-600 dark:text-gray-300 text-lg font-medium">Loading questions...</p>
@@ -232,7 +233,7 @@ const AttemptQuestions: React.FC = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 p-6">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 p-4">
         <div className="text-center bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
           <p className="text-red-500 text-lg font-semibold">{error}</p>
         </div>
@@ -241,7 +242,7 @@ const AttemptQuestions: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 p-4 sm:p-6">
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -253,19 +254,19 @@ const AttemptQuestions: React.FC = () => {
         theme="colored"
       />
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-4xl font-extrabold mb-10 text-gray-800 dark:text-white tracking-tight animate-fade-in">
+        <h2 className="text-3xl sm:text-4xl font-extrabold mb-8 text-gray-800 dark:text-white tracking-tight animate-fade-in">
           Explore Questions
         </h2>
-        <div className="flex flex-col sm:flex-row justify-between items-center mb-10 gap-4">
-          <div className="relative w-full sm:w-96">
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+          <div className="relative w-full sm:w-80 md:w-96">
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by category..."
-              className="w-full px-5 py-3 pl-12 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-md hover:shadow-lg"
+              className="w-full px-4 py-2.5 pl-10 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm hover:shadow-md text-sm sm:text-base"
             />
             <svg
-              className="absolute left-4 top-3.5 h-5 w-5 text-gray-400"
+              className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -280,71 +281,70 @@ const AttemptQuestions: React.FC = () => {
             </svg>
           </div>
         </div>
-        <div className="flex flex-col gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {paginatedQuestions.length === 0 ? (
-            <p className="text-gray-600 dark:text-gray-300 text-center text-lg font-medium animate-fade-in">
+            <p className="text-gray-600 dark:text-gray-300 text-center text-lg font-medium col-span-full animate-fade-in">
               No questions found.
             </p>
           ) : (
             paginatedQuestions.map((question) => (
               <div
                 key={question.question_id}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700 flex items-center justify-between w-full transform hover:shadow-xl transition-all duration-300 animate-fade-in"
+                className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 border border-gray-200 dark:border-gray-700 flex flex-col justify-between transform hover:shadow-lg transition-all duration-300 animate-fade-in"
               >
-                <div className="flex flex-col w-full">
-                  <h3 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-4">
+                <div>
+                  <h3 className="text-xl sm:text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-3 sm:mb-4 truncate">
                     {question.item.item_category}
                   </h3>
-                  <div className="flex justify-between items-center mb-3">
-                    <h4 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
-                      Question ID: {question.question_id}
-                    </h4>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                  <div className="flex justify-between items-center mb-2 sm:mb-3">
+                    <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                       {formatDate(question.created_at)}
                     </span>
                   </div>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="text-gray-600 dark:text-gray-300 font-medium">
-                      Categories:
+                  <div className="mb-3">
+                    <span className="text-sm sm:text-base text-gray-600 dark:text-gray-300 font-medium">
+                      Questions:
                     </span>
-                    {question.question_category.map((category, index) => (
-                      <span
-                        key={index}
-                        className="inline-block bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 text-sm font-semibold px-3 py-1 rounded-full"
-                      >
-                        {category}
-                      </span>
-                    ))}
+                    <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-1.5">
+                      {question.question_category.map((category, index) => (
+                        <span
+                          key={index}
+                          className="inline-block bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 text-xs sm:text-sm font-medium px-2 sm:px-3 py-1 rounded-full"
+                        >
+                          {category}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
                 <button
                   onClick={() => handleAddClick(question)}
-                  className="px-5 py-2 bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-lg hover:from-indigo-600 hover:to-blue-600 transition-all duration-300 shadow-md ml-4"
+                  className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-lg hover:from-indigo-600 hover:to-blue-600 transition-all duration-300 shadow-sm text-sm sm:text-base mt-3 sm:mt-0"
                 >
-                  Submit Answers
+                  Submit Marks
                 </button>
               </div>
             ))
           )}
         </div>
-        <div className="flex flex-col sm:flex-row justify-between items-center mt-10 gap-4">
-          <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row justify-between items-center mt-6 sm:mt-8 gap-4">
+          <div className="flex gap-2 sm:gap-3">
             <button
               onClick={handlePreviousPage}
               disabled={currentPage === 1}
-              className="px-5 py-2 bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed hover:from-indigo-600 hover:to-blue-600 transition-all duration-300 shadow-md"
+              className="px-3 sm:px-4 py-2 bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed hover:from-indigo-600 hover:to-blue-600 transition-all duration-300 shadow-sm text-sm sm:text-base"
             >
               Previous
             </button>
             <button
               onClick={handleNextPage}
               disabled={currentPage === totalPages}
-              className="px-5 py-2 bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed hover:from-indigo-600 hover:to-blue-600 transition-all duration-300 shadow-md"
+              className="px-3 sm:px-4 py-2 bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed hover:from-indigo-600 hover:to-blue-600 transition-all duration-300 shadow-sm text-sm sm:text-base"
             >
               Next
             </button>
           </div>
-          <div className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+          <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 font-medium">
             Page <span className="font-semibold">{currentPage}</span> of{' '}
             <span className="font-semibold">{totalPages}</span>
           </div>
@@ -354,7 +354,7 @@ const AttemptQuestions: React.FC = () => {
               setPageSize(Number(e.target.value));
               setCurrentPage(1);
             }}
-            className="px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-md"
+            className="px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-sm text-sm sm:text-base"
           >
             {[6, 9, 12, 15].map((size) => (
               <option key={size} value={size}>
@@ -366,16 +366,16 @@ const AttemptQuestions: React.FC = () => {
 
         {/* Modal for entering answers */}
         {isModalOpen && selectedQuestion && (
-          <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 animate-fade-in">
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-8 w-full max-w-lg shadow-2xl transform transition-all duration-300 max-h-[80vh] overflow-y-auto">
-              <h3 className="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100">
-                Submit Answers for Question ID: {selectedQuestion.question_id}
+          <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 animate-fade-in p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md sm:max-w-lg shadow-2xl transform transition-all duration-300 max-h-[90vh] overflow-y-auto">
+              <h3 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-gray-800 dark:text-gray-100">
+                Submit Marks for Question ID: {selectedQuestion.question_id}
               </h3>
               <form onSubmit={handleSubmit}>
-                <div className="mb-6">
+                <div className="mb-4 sm:mb-6">
                   <label
                     htmlFor="user_id"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2"
                   >
                     Select User
                   </label>
@@ -384,7 +384,7 @@ const AttemptQuestions: React.FC = () => {
                     name="user_id"
                     value={formData.user_id ?? ''}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                    className="w-full px-3 sm:px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm sm:text-base"
                     required
                   >
                     <option value="">Select a user</option>
@@ -396,10 +396,10 @@ const AttemptQuestions: React.FC = () => {
                   </select>
                 </div>
                 {formData.category_answers.map((categoryAnswer, index) => (
-                  <div key={index} className="mb-6">
+                  <div key={index} className="mb-4 sm:mb-6">
                     <label
                       htmlFor={`category_answer_${index}`}
-                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                      className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2"
                     >
                       {categoryAnswer.category}
                     </label>
@@ -409,16 +409,16 @@ const AttemptQuestions: React.FC = () => {
                       name="category_answer"
                       value={categoryAnswer.answer}
                       onChange={(e) => handleInputChange(e, index)}
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                      className="w-full px-3 sm:px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm sm:text-base"
                       placeholder={`Enter marks for ${categoryAnswer.category}`}
                       required
                     />
                   </div>
                 ))}
-                <div className="mb-6">
+                <div className="mb-4 sm:mb-6">
                   <label
                     htmlFor="total_marks"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2"
                   >
                     Total Marks
                   </label>
@@ -429,23 +429,23 @@ const AttemptQuestions: React.FC = () => {
                     value={formData.total_marks ?? ''}
                     onChange={handleInputChange}
                     min="1"
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                    className="w-full px-3 sm:px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm sm:text-base"
                     placeholder="Enter total marks"
                     required
                   />
                 </div>
-                <div className="flex justify-end gap-4">
+                <div className="flex justify-end gap-2 sm:gap-4">
                   <button
                     type="button"
                     onClick={closeModal}
-                    className="px-5 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all"
+                    className="px-3 sm:px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-all text-sm sm:text-base"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className={`px-5 py-2 bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-lg transition-all duration-300 flex items-center justify-center ${
+                    className={`px-3 sm:px-4 py-2 bg-gradient-to-r from-indigo-500 to-blue-500 text-white rounded-lg transition-all duration-300 flex items-center justify-center text-sm sm:text-base ${
                       isSubmitting
                         ? 'opacity-75 cursor-not-allowed'
                         : 'hover:from-indigo-600 hover:to-blue-600'
@@ -454,7 +454,7 @@ const AttemptQuestions: React.FC = () => {
                     {isSubmitting ? (
                       <>
                         <svg
-                          className="animate-spin h-5 w-5 mr-2 text-white"
+                          className="animate-spin h-4 sm:h-5 w-4 sm:w-5 mr-1 sm:mr-2 text-white"
                           xmlns="http://www.w3.org/2000/svg"
                           fill="none"
                           viewBox="0 0 24 24"

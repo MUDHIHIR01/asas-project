@@ -70,4 +70,7 @@ Route::get('/logged-user/questions', [QuestionController::class, 'LoggedUserItem
 //answers
 Route::resource('answers', AnswerController::class);
 Route::get('/logged/user-answers', [AnswerController::class, 'loggedUserAnswers']);
+Route::get('/user-answers', [AnswerController::class, 'UserAnswers']);
+
+Route::get('/report-for-answers', [AnswerController::class, 'AnswersReport']);
 });

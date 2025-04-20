@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import FilterBar from "../slots/FilterBar";
 import axiosInstance from "../../axios";
 import { 
   ShoppingCartIcon, 

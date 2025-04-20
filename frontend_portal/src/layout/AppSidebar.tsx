@@ -88,24 +88,23 @@ const getNavItemsForRole = (roleId: number) => {
       subItems: [{ name: "Manage Questions", path: "/questions" }],
     },
     {
-      name: "Answers",
+      name: "Marks",
       icon: (
         <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white">
           ✅ {/* Checkmark icon for answers */}
         </span>
       ),
-      subItems: [{ name: "Manage Answers", path: "/answers" }],
+      subItems: [{ name: "Manage  Marks", path: "/marks" }],
     },
     {
-      name: "Print Report",
+      name: "Get Report",
       icon: (
         <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-500 text-white">
           📄 {/* Document icon for reports */}
         </span>
       ),
       subItems: [
-        { name: "Questions Report", path: "/question-report" },
-        { name: "Answers Report", path: "/answer-report" },
+        { name: "Print Report", path: "/reports" },
       ],
     }
   ];
@@ -122,24 +121,23 @@ const getNavItemsForRole = (roleId: number) => {
       subItems: [{ name: "Attempt Questions", path: "/attemp-questions" }],
     },
     {
-      name: "Answers",
+      name: "Marks",
       icon: (
         <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white">
           ✅ {/* Checkmark icon for answers */}
         </span>
       ),
-      subItems: [{ name: "View Answers", path: "/view-answers" }],
+      subItems: [{ name: "View Marks", path: "/view-answers" }],
     },
     {
-      name: "Print Report",
+      name: "Get Report",
       icon: (
         <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-500 text-white">
           📄 {/* Document icon for reports */}
         </span>
       ),
       subItems: [
-        { name: "Questions Report", path: "/question-report-v1" },
-        { name: "Answers Report", path: "/answer-report-v2" },
+        { name: "Print Report", path: "/reports-v1" },
       ],
     }
   ];
@@ -153,7 +151,7 @@ const getNavItemsForRole = (roleId: number) => {
           🏆 {/* Trophy icon for results */}
         </span>
       ),
-      subItems: [{ name: "View KIP Results", path: "/kip-results" }],
+      subItems: [{ name: "View KIP Results", path: "/user-marks" }],
     },
   ];
 

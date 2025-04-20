@@ -119,7 +119,7 @@ export default function ResetPasswordRequestForm() {
               
               <div className="text-center">
                 <Link 
-                  to="/sign-in" 
+                  to="/" 
                   className="text-sm text-blue-600 hover:underline dark:text-blue-400"
                 >
                   Back Home
