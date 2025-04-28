@@ -1,3 +1,5 @@
+<<<<<<< HEAD
+=======
 # <IfModule mod_rewrite.c>
 #     <IfModule mod_negotiation.c>
 #         Options -MultiViews -Indexes
@@ -19,6 +21,7 @@
 #     RewriteCond %{REQUEST_FILENAME} !-f
 #     RewriteRule ^ index.php [L]
 # </IfModule>
+>>>>>>> 9d6779c (first commit)
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes
@@ -26,6 +29,13 @@
 
     RewriteEngine On
 
+<<<<<<< HEAD
+    # Set correct MIME types
+    AddType text/css .css
+    AddType application/javascript .js
+
+=======
+>>>>>>> 9d6779c (first commit)
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
@@ -43,4 +53,8 @@
 
     # Send Requests To API Front Controller...
     RewriteRule ^api/.*$ /api/index.php [L]
+<<<<<<< HEAD
 </IfModule>
+=======
+</IfModule>
+>>>>>>> 9d6779c (first commit)
