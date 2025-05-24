@@ -14,21 +14,24 @@ class Question extends Model
     protected $fillable = [
         'item_id',
         'question_category',
-        'status'
+        'choice',
+        'marks_caryy_that_choice',
+        'user_id',
+        'employee_id',
+        'status',
+        'marks_per_choice_attempted'
     ];
 
     protected $casts = [
-        'question_category' => 'array', // Automatically cast JSON to array
+        'question_category' => 'array',
+        'choice' => 'array',
+        'marks_caryy_that_choice' => 'array',
+        'user_id' => 'array',
+        'marks_per_choice_attempted' => 'array'
     ];
 
     public function item()
     {
         return $this->belongsTo(Item::class, 'item_id', 'item_id');
-    }
-
-
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
 }

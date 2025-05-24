@@ -12,8 +12,20 @@ interface QuestionData {
   question_id: number;
   item_id: number;
   question_category: string[];
-  created_at?: string;
-  item: { item_category: string };
+  choice: string[];
+  marks_caryy_that_choice: number[];
+  marks_per_choice_attempted: {
+    user_id: number | null;
+    choice_index: number;
+    marks: number;
+    attempted_at: string;
+  }[];
+  user_id: (number | null)[];
+  employee_id: number | null;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  item_category: string;
 }
 
 const formatDate = (dateString?: string): string => {
@@ -80,12 +92,30 @@ const Questions: React.FC = () => {
   const [data, setData] = useState<QuestionData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [itemId, setItemId] = useState<string>(''); // State for item_id input
+  const [items, setItems] = useState<{ item_id: number; item_category: string }[]>([]); // State for item list
 
+  // Fetch available items for dropdown
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const response = await axiosInstance.get<{ data: { item_id: number; item_category: string }[] }>('/api/items'); // Adjust endpoint as needed
+        setItems(response.data.data || []);
+      } catch (err: any) {
+        toast.error(err.response?.data?.message || 'Failed to fetch items', { position: 'top-right' });
+      }
+    };
+    fetchItems();
+  }, []);
+
+  // Fetch questions based on item_id or all questions if no item_id
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const response = await axiosInstance.get<{ questions: QuestionData[] }>('/api/questions');
-        setData(response.data.questions || []);
+        setLoading(true);
+        const endpoint = itemId ? `/api/questions/item/${itemId}` : '/api/questions';
+        const response = await axiosInstance.get<{ data: QuestionData[] }>(endpoint);
+        setData(response.data.data || []);
       } catch (err: any) {
         setError(err.response?.data?.message || 'Failed to fetch questions');
         toast.error('Failed to fetch questions', { position: 'top-right' });
@@ -94,26 +124,26 @@ const Questions: React.FC = () => {
       }
     };
     fetchQuestions();
-  }, []);
+  }, [itemId]);
 
   const columns: Column<QuestionData>[] = useMemo(
     () => [
-      { 
-        Header: '#', 
-        accessor: 'count' as any, 
+      {
+        Header: '#',
+        accessor: 'count' as any,
         Cell: ({ row }: { row: Row<QuestionData> }) => <span>{row.index + 1}</span>,
         width: 60,
         minWidth: 50
       },
-      { 
-        Header: 'Item Category', 
-        accessor: 'item.item_category',
+      {
+        Header: 'Item Category',
+        accessor: 'item_category',
         width: 150,
         minWidth: 120
       },
-      { 
-        Header: 'Question Categories', 
-        accessor: 'question_category', 
+      {
+        Header: 'Question Categories',
+        accessor: 'question_category',
         Cell: ({ value }: { value: string[] }) => {
           const joined = value.join(', ');
           return (
@@ -125,16 +155,44 @@ const Questions: React.FC = () => {
         width: 200,
         minWidth: 150
       },
-      { 
-        Header: 'Created At', 
-        accessor: 'created_at', 
-        Cell: ({ value }: { value: string | undefined }) => formatDate(value),
+      {
+        Header: 'Choices',
+        accessor: 'choice',
+        Cell: ({ value }: { value: string[] }) => {
+          const joined = value.join(', ');
+          return (
+            <div className="max-w-[200px] sm:max-w-[300px] break-words whitespace-normal">
+              {joined}
+            </div>
+          );
+        },
+        width: 200,
+        minWidth: 150
+      },
+      {
+        Header: 'Marks per Choice',
+        accessor: 'marks_caryy_that_choice',
+        Cell: ({ value }: { value: number[] }) => {
+          const joined = value.join(', ');
+          return (
+            <div className="max-w-[200px] sm:max-w-[300px] break-words whitespace-normal">
+              {joined}
+            </div>
+          );
+        },
+        width: 150,
+        minWidth: 120
+      },
+      {
+        Header: 'Created At',
+        accessor: 'created_at',
+        Cell: ({ value }: { value: string }) => formatDate(value),
         width: 120,
         minWidth: 100
       },
-      { 
-        Header: 'Actions', 
-        accessor: 'question_id', 
+      {
+        Header: 'Actions',
+        accessor: 'question_id',
         Cell: ({ value }: { value: number }) => <ActionButtons questionId={value} />,
         width: 100,
         minWidth: 80
@@ -158,12 +216,12 @@ const Questions: React.FC = () => {
     setGlobalFilter,
     state: { pageIndex, pageSize, globalFilter },
   } = useTable<QuestionData>(
-    { 
-      columns, 
-      data, 
-      initialState: { 
-        pageIndex: 0, 
-        pageSize: 10 
+    {
+      columns,
+      data,
+      initialState: {
+        pageIndex: 0,
+        pageSize: 10
       }
     },
     useGlobalFilter,
@@ -174,19 +232,23 @@ const Questions: React.FC = () => {
     const doc = new jsPDF();
     doc.text('Questions Data', 14, 10);
     autoTable(doc, {
-      head: [['#', 'Item Category', 'Question Categories', 'Created At']],
+      head: [['#', 'Item Category', 'Question Categories', 'Choices', 'Marks per Choice', 'Created At']],
       body: data.map((row, index) => [
-        index + 1, 
-        row.item.item_category, 
-        row.question_category.join(', '), 
+        index + 1,
+        row.item_category,
+        row.question_category.join(', '),
+        row.choice.join(', '),
+        row.marks_caryy_that_choice.join(', '),
         formatDate(row.created_at)
       ]),
       styles: { fontSize: 8 },
       columnStyles: {
         0: { cellWidth: 20 },
         1: { cellWidth: 40 },
-        2: { cellWidth: 80 },
-        3: { cellWidth: 30 }
+        2: { cellWidth: 60 },
+        3: { cellWidth: 60 },
+        4: { cellWidth: 40 },
+        5: { cellWidth: 30 }
       }
     });
     doc.save('questions_data.pdf');
@@ -197,8 +259,10 @@ const Questions: React.FC = () => {
     const worksheet = XLSX.utils.json_to_sheet(
       data.map((row, index) => ({
         '#': index + 1,
-        Item_Category: row.item.item_category,
+        Item_Category: row.item_category,
         Question_Categories: row.question_category.join(', '),
+        Choices: row.choice.join(', '),
+        Marks_per_Choice: row.marks_caryy_that_choice.join(', '),
         Created_At: formatDate(row.created_at),
       }))
     );
@@ -213,13 +277,13 @@ const Questions: React.FC = () => {
 
   return (
     <div className="p-4 max-w-full mx-auto">
-      <ToastContainer 
-        position="top-right" 
-        autoClose={3000} 
-        style={{ top: '70px' }} 
-        closeOnClick 
-        pauseOnHover 
-        draggable 
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        style={{ top: '70px' }}
+        closeOnClick
+        pauseOnHover
+        draggable
       />
       <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
@@ -235,12 +299,26 @@ const Questions: React.FC = () => {
           </Link>
         </div>
         <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-          <input
-            value={globalFilter || ''}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-            placeholder="Search questions..."
-            className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-64"
-          />
+          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+            <select
+              value={itemId}
+              onChange={(e) => setItemId(e.target.value)}
+              className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-64"
+            >
+              <option value="">All Questions</option>
+              {items.map(item => (
+                <option key={item.item_id} value={item.item_id}>
+                  {item.item_category} (ID: {item.item_id})
+                </option>
+              ))}
+            </select>
+            <input
+              value={globalFilter || ''}
+              onChange={(iotics) => setGlobalFilter(e.target.value)}
+              placeholder="Search questions..."
+              className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-64"
+            />
+          </div>
           <div className="flex gap-2">
             <button onClick={exportToPDF} className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">PDF</button>
             <button onClick={exportToExcel} className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">Excel</button>
@@ -252,8 +330,8 @@ const Questions: React.FC = () => {
               {headerGroups.map(headerGroup => (
                 <tr {...headerGroup.getHeaderGroupProps()}>
                   {headerGroup.headers.map(column => (
-                    <th 
-                      {...column.getHeaderProps()} 
+                    <th
+                      {...column.getHeaderProps()}
                       className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b"
                       style={{
                         minWidth: column.minWidth,
@@ -272,8 +350,8 @@ const Questions: React.FC = () => {
                 return (
                   <tr {...row.getRowProps()} className="hover:bg-gray-50">
                     {row.cells.map(cell => (
-                      <td 
-                        {...cell.getCellProps()} 
+                      <td
+                        {...cell.getCellProps()}
                         className="px-3 py-4 text-sm text-gray-900 border-b"
                       >
                         {cell.render('Cell')}

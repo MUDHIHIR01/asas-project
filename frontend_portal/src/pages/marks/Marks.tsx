@@ -3,18 +3,15 @@ import axiosInstance from '../../axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-// Define interfaces based on the backend response
-interface CategoryAnswer {
-  category: string;
-  answer: string;
-}
-
-interface Question {
+// Define interfaces based on the /api/marks/all response
+interface Mark {
+  mark_id: number | null;
+  user_id: number;
+  user_name: string;
   question_id: number;
   item_id: number;
-  status: string;
-  question_category: string[];
-  item_category: string | null; // Nullable due to leftJoin
+  item_category: string;
+  total_marks: number;
   created_at: string;
   updated_at: string;
 }
@@ -24,62 +21,73 @@ interface User {
   name: string;
 }
 
-interface Answer {
-  answer_id: number;
+interface GroupedMarks {
   user: User;
-  question: Question;
-  category_answers: CategoryAnswer[];
-  created_at: string;
-  total_marks: number;
-}
-
-interface GroupedAnswers {
-  user: User;
-  answersByCategory: { [key: string]: { answers: Answer[] } };
+  marksByCategory: { [key: string]: Mark[] };
 }
 
 const UserAnswers: React.FC = () => {
-  const [groupedAnswers, setGroupedAnswers] = useState<GroupedAnswers[]>([]);
-  const [filteredAnswers, setFilteredAnswers] = useState<GroupedAnswers[]>([]);
+  const [marksByMonth, setMarksByMonth] = useState<Record<string, GroupedMarks[]>>({});
+  const [filteredMarksByMonth, setFilteredMarksByMonth] = useState<Record<string, GroupedMarks[]>>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState<string>('');
 
-  // Fetch answers from /api/answers and group by user and category
+  // Fetch marks from /api/marks/all and group by month, user, and category
   useEffect(() => {
-    const fetchAnswers = async () => {
+    const fetchMarks = async () => {
       try {
         setLoading(true);
-        const response = await axiosInstance.get<{ answers: Answer[] }>('/api/logged/user-answers');
-        const answers = response.data.answers || [];
+        const response = await axiosInstance.get<{ data: Mark[] }>('/api/marks/all');
+        const marks = response.data.data || [];
 
-        // Group answers by user and then by item_category
-        const grouped = answers.reduce((acc: GroupedAnswers[], answer: Answer) => {
-          const user = answer.user || { user_id: 0, name: 'Unknown' };
-          const item_category = answer.question?.item_category || 'Uncategorized';
-          let userGroup = acc.find((group) => group.user.user_id === user.user_id);
+        // Group marks by month, then by user and item_category
+        const groupedByMonth = marks.reduce((acc: Record<string, GroupedMarks[]>, mark: Mark) => {
+          const date = new Date(mark.created_at);
+          const monthYear = date.toLocaleString('en-US', { month: 'long', year: 'numeric' });
 
+          if (!acc[monthYear]) {
+            acc[monthYear] = [];
+          }
+
+          // Map mark to user and category
+          const user: User = { user_id: mark.user_id, name: mark.user_name };
+          const item_category = mark.item_category || 'Uncategorized';
+
+          let userGroup = acc[monthYear].find((group) => group.user.user_id === user.user_id);
           if (!userGroup) {
             userGroup = {
               user,
-              answersByCategory: {},
+              marksByCategory: {},
             };
-            acc.push(userGroup);
+            acc[monthYear].push(userGroup);
           }
 
-          if (!userGroup.answersByCategory[item_category]) {
-            userGroup.answersByCategory[item_category] = { answers: [] };
+          if (!userGroup.marksByCategory[item_category]) {
+            userGroup.marksByCategory[item_category] = [];
           }
-          userGroup.answersByCategory[item_category].answers.push(answer);
+          userGroup.marksByCategory[item_category].push(mark);
 
           return acc;
-        }, []);
+        }, {} as Record<string, GroupedMarks[]>);
 
-        setGroupedAnswers(grouped);
-        setFilteredAnswers(grouped);
+        // Sort months in descending order (newest first)
+        const sortedGrouped = Object.keys(groupedByMonth)
+          .sort((a, b) => {
+            const dateA = new Date(a + ' 1');
+            const dateB = new Date(b + ' 1');
+            return dateB.getTime() - dateA.getTime();
+          })
+          .reduce((acc, key) => {
+            acc[key] = groupedByMonth[key];
+            return acc;
+          }, {} as Record<string, GroupedMarks[]>);
+
+        setMarksByMonth(sortedGrouped);
+        setFilteredMarksByMonth(sortedGrouped);
       } catch (err: any) {
-        console.error('Error fetching answers:', err);
-        const errorMessage = err.response?.data?.message || 'Failed to load answers. Please try again.';
+        console.error('Error fetching marks:', err);
+        const errorMessage = err.response?.data?.message || 'Failed to load marks. Please try again.';
         setError(errorMessage);
         toast.error(errorMessage, { position: 'top-right' });
       } finally {
@@ -87,21 +95,24 @@ const UserAnswers: React.FC = () => {
       }
     };
 
-    fetchAnswers();
+    fetchMarks();
   }, []);
 
   // Handle search by user.name and item_category
   useEffect(() => {
     const lowercasedSearch = search.toLowerCase();
-    const filtered = groupedAnswers.filter((group) => {
-      const matchesUserName = group.user.name.toLowerCase().includes(lowercasedSearch);
-      const matchesCategory = Object.keys(group.answersByCategory).some((category) =>
-        category.toLowerCase().includes(lowercasedSearch)
-      );
-      return matchesUserName || matchesCategory;
-    });
-    setFilteredAnswers(filtered);
-  }, [search, groupedAnswers]);
+    const filtered = Object.keys(marksByMonth).reduce((acc: Record<string, GroupedMarks[]>, month) => {
+      acc[month] = marksByMonth[month].filter((group) => {
+        const matchesUserName = group.user.name.toLowerCase().includes(lowercasedSearch);
+        const matchesCategory = Object.keys(group.marksByCategory).some((category) =>
+          category.toLowerCase().includes(lowercasedSearch)
+        );
+        return matchesUserName || matchesCategory;
+      });
+      return acc;
+    }, {} as Record<string, GroupedMarks[]>);
+    setFilteredMarksByMonth(filtered);
+  }, [search, marksByMonth]);
 
   // Format created_at date
   const formatDate = (dateString: string) => {
@@ -119,7 +130,7 @@ const UserAnswers: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-300 text-lg font-medium">Loading answers...</p>
+          <p className="text-gray-600 dark:text-gray-300 text-lg font-medium">Loading marks...</p>
         </div>
       </div>
     );
@@ -142,7 +153,7 @@ const UserAnswers: React.FC = () => {
     );
   }
 
-  // Render grouped answers with search
+  // Render grouped marks with search
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 p-6">
       <ToastContainer
@@ -157,7 +168,7 @@ const UserAnswers: React.FC = () => {
       />
       <div className="max-w-7xl mx-auto">
         <h2 className="text-4xl font-extrabold mb-10 text-gray-800 dark:text-white tracking-tight animate-fade-in">
-          Sellers Marks
+          Employee Marks
         </h2>
         <div className="flex flex-col sm:flex-row justify-between items-center mb-10 gap-4">
           <div className="relative w-full sm:w-96">
@@ -183,77 +194,64 @@ const UserAnswers: React.FC = () => {
             </svg>
           </div>
         </div>
-        {filteredAnswers.length === 0 ? (
+        {Object.keys(filteredMarksByMonth).length === 0 ? (
           <p className="text-gray-600 dark:text-gray-300 text-center text-lg font-medium animate-fade-in">
-            No answers found.
+            No marks found.
           </p>
         ) : (
-          <div className="flex flex-col gap-6">
-            {filteredAnswers.map((group, index) => (
-              <div
-                key={`user-${group.user.user_id}-${index}`}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700 w-full transform hover:shadow-xl transition-all duration-300 animate-fade-in"
-              >
-                <h3 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-4">
-                  {group.user.name}
-                </h3>
-                <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
-                  {Object.entries(group.answersByCategory).map(([category, { answers }], catIndex) => (
-                    <div key={`${category}-${catIndex}`} className="mb-4">
-                      <div className="mb-2">
-                        <h4 className="text-lg font-semibold text-silver-800 dark:text-gray-100">
-                          {category}
-                        </h4>
-                      </div>
-                      {answers.map((answer, answerIndex) => (
-                        <div key={answer.answer_id}>
-                          <div
-                            className="flex flex-row items-center gap-6 flex-wrap text-sm text-gray-600 dark:text-gray-400 mb-2"
-                          >
-                            <div className="min-w-[150px]  text-yellow-600 ">
-                              <strong>Category:</strong> {category}
-                            </div>
-                            <div className="min-w-[150px]">
-                              <strong>Questions:</strong>{' '}
-                              {answer.question?.question_category?.join(', ') || 'N/A'}
-                            </div>
-                            <div className="min-w-[200px]">
-                              <strong>Question Created At:</strong>{' '}
-                              <span className="text-red-600 font-medium">{formatDate(answer.question.created_at)}</span>
-                            </div>
-                            <div className="min-w-[200px] pr-4 border-r border-gray-300 dark:border-gray-600">
-                              <strong>Marks:</strong>{' '}
-                              {answer.category_answers
-                                ? answer.category_answers
-                                    .map((ca) => (
-                                      <span key={`${ca.category}-${ca.answer}`}>
-                                        {ca.category}: <span className="font-bold text-green-900">{ca.answer}</span>
-                                      </span>
-                                    ))
-                                    .reduce((prev, curr, i) => (i === 0 ? [curr] : [...prev, '; ', curr]), [] as React.ReactNode[])
-                                : 'No answers provided'}
-                            </div>
-                            <div className="flex items-center gap-6">
-                              <div className="min-w-[100px]">
-                                <strong>Total Marks:</strong> {answer.total_marks ?? 'N/A'}
+          Object.keys(filteredMarksByMonth).map((month) => (
+            <div key={month} className="mb-12">
+              <h3 className="text-2xl font-bold text-gray-800 dark:text-white mb-6">{month}</h3>
+              {filteredMarksByMonth[month].length === 0 ? (
+                <p className="text-gray-600 dark:text-gray-300 text-center text-lg font-medium animate-fade-in">
+                  No marks found for {month}.
+                </p>
+              ) : (
+                <div className="flex flex-col gap-6">
+                  {filteredMarksByMonth[month].map((group, index) => (
+                    <div
+                      key={`user-${group.user.user_id}-${index}`}
+                      className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700 w-full transform hover:shadow-xl transition-all duration-300 animate-fade-in"
+                    >
+                      <h3 className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-4">
+                        {group.user.name}
+                      </h3>
+                      <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+                        {Object.entries(group.marksByCategory).map(([category, marks], catIndex) => (
+                          <div key={`${category}-${catIndex}`} className="mb-4">
+                            <h4 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">
+                              {category}
+                            </h4>
+                            {marks.map((mark, markIndex) => (
+                              <div key={`mark-${mark.question_id}-${markIndex}`}>
+                                <div className="flex flex-row items-center gap-6 flex-wrap text-sm text-gray-600 dark:text-gray-400 mb-2">
+                                  <div className="min-w-[150px] text-yellow-600">
+                                    <strong>Category:</strong> {category}
+                                  </div>
+                                 
+                                  <div className="min-w-[200px]">
+                                    <strong>Mark Created At:</strong>{' '}
+                                    <span className="text-red-600 font-medium">{formatDate(mark.created_at)}</span>
+                                  </div>
+                                  <div className="min-w-[100px]">
+                                    <strong>Total Marks:</strong> {mark.total_marks ?? 'N/A'}
+                                  </div>
+                                </div>
+                                <hr className="my-2 border-t-2 border-blue-300" />
                               </div>
-                              <div className="text-sm text-green-600 font-medium">
-                                Marks Created At: {formatDate(answer.created_at)}
-                              </div>
-                            </div>
+                            ))}
+                            {catIndex < Object.keys(group.marksByCategory).length - 1 && (
+                              <hr className="my-4 border-t-2 py-5 border-gray-900 dark:border-gray-600" />
+                            )}
                           </div>
-                          <hr className="my-2 border-t-2 border-blue-300" />
-                        </div>
-                      ))}
-                      {catIndex < Object.keys(group.answersByCategory).length - 1 && (
-                        <hr className="my-4 border-t-2 py-5 border-gray-900 dark:border-gray-600"  />
-                      )}
+                        ))}
+                      </div>
                     </div>
                   ))}
                 </div>
-              </div>
-            ))}
-          </div>
+              )}
+            </div>
+          ))
         )}
       </div>
     </div>

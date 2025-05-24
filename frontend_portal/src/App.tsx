@@ -35,6 +35,7 @@ import  Questions   from  './pages/questions/Questions'
 import  EditQuestion  from  './pages/questions/EditQuestion'
 import  CreateQuestion  from  './pages/questions/CreateQuestion'
 import  AttemptQuestions  from './pages/questions/AttemptQuestions'
+import UserAttempQs  from './pages/questions/UserAttempQs'
 import  Marks  from  './pages/marks/Marks'
 import  ViewMarks from './pages/marks/ViewMarks'
 import  Reports  from './pages/marks/Reports'
@@ -217,6 +218,17 @@ export default function App() {
   }
 
 />
+
+<Route
+  path="//user/attemp-questions"
+  element={
+    <ProtectedRoute>
+      <UserAttempQs />
+    </ProtectedRoute>
+  }
+
+/>
+
 
 
 <Route

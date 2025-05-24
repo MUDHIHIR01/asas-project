@@ -12,6 +12,11 @@ class CreateQuestionsTable extends Migration
             $table->id('question_id'); // Primary key
             $table->unsignedBigInteger('item_id'); // Foreign key to items
             $table->json('question_category');
+            $table->json('choice');
+            $table->json('marks_caryy_that_choice');
+            $table->json('marks_per_choice_attempted');
+            $table->json('user_id');
+            $table->unsignedBigInteger('employee_id')->nullable();
             $table->string('status')->default('pending');
             $table->timestamps();
 

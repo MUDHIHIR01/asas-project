@@ -30,15 +30,9 @@ interface Question {
   updated_at: string;
 }
 
-interface User {
-  user_id: number;
-  name: string;
-}
-
 const AttemptQuestions: React.FC = () => {
   const [questionsByMonth, setQuestionsByMonth] = useState<Record<string, Question[]>>({});
   const [filteredQuestionsByMonth, setFilteredQuestionsByMonth] = useState<Record<string, Question[]>>({});
-  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState<string>('');
@@ -47,23 +41,19 @@ const AttemptQuestions: React.FC = () => {
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [formData, setFormData] = useState<{ choice_index: number | null; employee_id: number | null }>({
+  const [formData, setFormData] = useState<{ choice_index: number | null }>({
     choice_index: null,
-    employee_id: null,
   });
 
-  // Fetch questions and users on mount
+  // Fetch questions on mount
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const [questionsResponse, usersResponse] = await Promise.all([
-          axiosInstance.get<{ data: Question[] }>('/api/questions'),
-          axiosInstance.get<{ users: User[] }>('/api/user-dropdown'),
-        ]);
+        const response = await axiosInstance.get<{ data: Question[] }>('/api/questions');
+        const questions = response.data.data || [];
 
         // Group questions by month and year
-        const questions = questionsResponse.data.data || [];
         const grouped = questions.reduce((acc, question) => {
           const date = new Date(question.created_at);
           const monthYear = date.toLocaleString('en-US', { month: 'long', year: 'numeric' });
@@ -88,7 +78,6 @@ const AttemptQuestions: React.FC = () => {
 
         setQuestionsByMonth(sortedGrouped);
         setFilteredQuestionsByMonth(sortedGrouped);
-        setUsers(usersResponse.data.users || []);
 
         // Initialize pagination for each month
         const initialPages = Object.keys(sortedGrouped).reduce((acc, month) => {
@@ -97,9 +86,9 @@ const AttemptQuestions: React.FC = () => {
         }, {} as Record<string, number>);
         setCurrentPageByMonth(initialPages);
       } catch (err: any) {
-        console.error('Error fetching data:', err);
-        setError('Failed to load questions or users. Please try again.');
-        toast.error('Failed to load data.', { position: 'top-right' });
+        console.error('Error fetching questions:', err);
+        setError('Failed to load questions. Please try again.');
+        toast.error('Failed to load questions.', { position: 'top-right' });
       } finally {
         setLoading(false);
       }
@@ -164,17 +153,14 @@ const AttemptQuestions: React.FC = () => {
   // Open modal and initialize form
   const handleAttemptClick = (question: Question) => {
     setSelectedQuestion(question);
-    setFormData({ choice_index: null, employee_id: null });
+    setFormData({ choice_index: null });
     setIsModalOpen(true);
   };
 
   // Handle form input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value ? Number(value) : null,
-    }));
+    const { value } = e.target;
+    setFormData({ choice_index: value ? Number(value) : null });
   };
 
   // Handle form submission
@@ -195,14 +181,11 @@ const AttemptQuestions: React.FC = () => {
       setIsSubmitting(true);
       const payload = {
         choice_index: formData.choice_index,
-        employee_id: formData.employee_id,
       };
 
-      // Get marks for the selected choice
-      const choiceMarks = selectedQuestion.marks_caryy_that_choice[formData.choice_index];
-
       const response = await axiosInstance.post(`/api/questions/${selectedQuestion.question_id}/attempt`, payload);
-      toast.success(`Attempt submitted! You scored ${choiceMarks} marks.`, { position: 'top-right' });
+      const marks = response.data.data.marks.total_marks;
+      toast.success(`Attempt submitted! You scored ${marks} marks.`, { position: 'top-right' });
 
       // Update questions state with new attempt data
       setQuestionsByMonth((prev) => {
@@ -215,7 +198,6 @@ const AttemptQuestions: React.FC = () => {
                 marks_per_choice_attempted: response.data.data.question.marks_per_choice_attempted,
                 status: response.data.data.question.status,
                 user_id: response.data.data.question.user_id,
-                employee_id: response.data.data.question.employee_id,
                 updated_at: response.data.data.question.updated_at,
               }
             : q
@@ -233,7 +215,6 @@ const AttemptQuestions: React.FC = () => {
                 marks_per_choice_attempted: response.data.data.question.marks_per_choice_attempted,
                 status: response.data.data.question.status,
                 user_id: response.data.data.question.user_id,
-                employee_id: response.data.data.question.employee_id,
                 updated_at: response.data.data.question.updated_at,
               }
             : q
@@ -243,7 +224,7 @@ const AttemptQuestions: React.FC = () => {
 
       setIsModalOpen(false);
       setSelectedQuestion(null);
-      setFormData({ choice_index: null, employee_id: null });
+      setFormData({ choice_index: null });
     } catch (err: any) {
       console.error('Error submitting attempt:', err);
       const errorMessage = err.response?.data?.message || 'Failed to submit attempt.';
@@ -257,7 +238,7 @@ const AttemptQuestions: React.FC = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedQuestion(null);
-    setFormData({ choice_index: null, employee_id: null });
+    setFormData({ choice_index: null });
   };
 
   // Format created_at date
@@ -449,28 +430,6 @@ const AttemptQuestions: React.FC = () => {
                 Attempt Question ID: {selectedQuestion.question_id}
               </h3>
               <form onSubmit={handleSubmit}>
-                <div className="mb-4 sm:mb-6">
-                  <label
-                    htmlFor="employee_id"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2"
-                  >
-                    Select Employee
-                  </label>
-                  <select
-                    id="employee_id"
-                    name="employee_id"
-                    value={formData.employee_id ?? ''}
-                    onChange={handleInputChange}
-                    className="w-full px-3 sm:px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm sm:text-base"
-                  >
-                    <option value="">None</option>
-                    {users.map((user) => (
-                      <option key={user.user_id} value={user.user_id}>
-                        {user.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
                 <div className="mb-4 sm:mb-6">
                   <label
                     htmlFor="choice_index"

@@ -64,13 +64,20 @@ Route::resource('items', ItemController::class);
 Route::get('item/by-dropdown', [ItemController::class, 'ItemDropDown']);
 
 //questions 
-Route::resource('questions', QuestionController::class);
-Route::get('/logged-user/questions', [QuestionController::class, 'LoggedUserItem']);
-    
-//answers
-Route::resource('answers', AnswerController::class);
-Route::get('/logged/user-answers', [AnswerController::class, 'loggedUserAnswers']);
-Route::get('/user-answers', [AnswerController::class, 'UserAnswers']);
+    Route::post('/questions', [QuestionController::class, 'createQuestion']);
+    Route::post('/questions/{question_id}/attempt', [QuestionController::class, 'attemptQuestion']);
+    Route::get('/marks', [QuestionController::class, 'getMarks'])->name('marks.index');
+    Route::get('/report-for-answers', [AnswerController::class, 'AnswersReport']);
 
-Route::get('/report-for-answers', [AnswerController::class, 'AnswersReport']);
+
+
+Route::post('/questions', [QuestionController::class, 'createQuestion']);
+Route::put('/questions/{question_id}', [QuestionController::class, 'updateQuestion']);
+Route::post('/questions/{question_id}/attempt', [QuestionController::class, 'attemptQuestion']);
+Route::get('/marks', [QuestionController::class, 'getMarks']);
+Route::get('/questions', [QuestionController::class, 'getAllQuestions']);
+Route::get('/marks/all', [QuestionController::class, 'getAllMarksWithItem']);
+Route::get('/user/marks/category', [QuestionController::class, 'getUserMarksWithCategory']);
+Route::get('/user/questions/marks', [QuestionController::class, 'getUserQuestionsAndMarks']);
+Route::get('/questions/item/{item_id}', [QuestionController::class, 'getQuestionsByItemId']);
 });

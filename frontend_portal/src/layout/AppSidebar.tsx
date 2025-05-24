@@ -112,7 +112,7 @@ const getNavItemsForRole = (roleId: number) => {
   const role2NavItems: NavItem[] = [
     ...baseNavItems,
     {
-      name: "Questions",
+      name: "Attempt Questions",
       icon: (
         <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-pink-500 text-white">
           ❓ {/* Question mark icon for questions */}
@@ -145,6 +145,16 @@ const getNavItemsForRole = (roleId: number) => {
   const role3NavItems: NavItem[] = [
     ...baseNavItems,
     {
+      name: "Attem Question",
+      icon: (
+        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-pink-500 text-white">
+          ❓ {/* Question mark icon for questions */}
+        </span>
+      ),
+      subItems: [{ name: "Attempt Questions", path: "/user/attemp-questions" }],
+    },
+
+    {
       name: "KIP Results",
       icon: (
         <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-cyan-500 text-white">
@@ -153,6 +163,8 @@ const getNavItemsForRole = (roleId: number) => {
       ),
       subItems: [{ name: "View KIP Results", path: "/user-marks" }],
     },
+
+
   ];
 
   switch (roleId) {
