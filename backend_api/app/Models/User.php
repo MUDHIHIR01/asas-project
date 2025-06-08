@@ -17,13 +17,6 @@ class User extends Authenticatable
         'name',
         'role_id',
         'status',
-        'nida',
-        'address',
-        'sex',
-        'date_of_birth',
-        'contact',
-        'auto_number',
-        'item_id',
         'email',
         'password',
     ];
@@ -41,10 +34,5 @@ class User extends Authenticatable
     public function role()
     {
         return $this->belongsTo(Role::class, 'role_id', 'role_id');
-    }
-
-    public function item()
-    {
-        return $this->belongsTo(Item::class, 'item_id', 'item_id');
     }
 }

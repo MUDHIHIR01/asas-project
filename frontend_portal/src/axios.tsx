@@ -29,7 +29,7 @@ axiosInstance.interceptors.response.use(
     if (error.response?.status === 401) {
       console.error('Unauthorized access - redirecting to login');
       localStorage.removeItem('token');
-      window.location.href = '/';
+      window.location.href = '/sign-in';
     }
     return Promise.reject(error);
   }

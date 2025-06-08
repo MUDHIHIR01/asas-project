@@ -1,92 +1,62 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router";
-import axiosInstance from "../../axios";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import axiosInstance from '../../axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-interface Item {
-  item_id: number;
-  item_category: string;
+interface FormData {
+  name: string;
+  email: string;
+  password: string;
+  role_id: string;
+  status: string;
 }
 
-export default function EditUser() {
+interface Role {
+  role_id: number;
+  category: string;
+}
+
+const EditUser: React.FC = () => {
   const navigate = useNavigate();
-  const { userId }: { userId: string } = useParams();
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    status: "",
-    role_id: "",
-    password: "",
-    nida: "",
-    address: "",
-    sex: "",
-    date_of_birth: "",
-    contact: "",
-    auto_number: "",
-    item_id: "",
-    custom_item: "" // New field for custom item when "Others" is selected
+  const { userId } = useParams<{ userId: string }>();
+  const [formData, setFormData] = useState<FormData>({
+    name: '',
+    email: '',
+    password: '',
+    role_id: '',
+    status: '',
   });
-  const [errors, setErrors] = useState({
-    name: "",
-    email: "",
-    status: "",
-    role_id: "",
-    password: "",
-    nida: "",
-    address: "",
-    sex: "",
-    date_of_birth: "",
-    contact: "",
-    auto_number: "",
-    item_id: "",
-    custom_item: ""
-  });
+  const [errors, setErrors] = useState<Partial<FormData>>({});
   const [loading, setLoading] = useState(false);
-  const [roles, setRoles] = useState<any[]>([]);
-  const [items, setItems] = useState<Item[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [userResponse, roleResponse, itemResponse] = await Promise.all([
+        const [userResponse, roleResponse] = await Promise.all([
           axiosInstance.get(`/api/all/users`),
           axiosInstance.get('/api/roles/dropdown-options'),
-          axiosInstance.get('/api/item/by-dropdown')
         ]);
 
-        const user = userResponse.data.users.find((u: any) => u.user_id === parseInt(userId || ""));
+        const user = userResponse.data.users.find((u: any) => u.user_id === parseInt(userId || ''));
         if (user) {
           setFormData({
             name: user.name,
             email: user.email,
             status: user.status,
-            role_id: "",
-            password: "",
-            nida: user.nida || "",
-            address: user.address || "",
-            sex: user.sex || "",
-            date_of_birth: user.date_of_birth || "",
-            contact: user.contact || "",
-            auto_number: user.auto_number || "",
-            item_id: user.item_id ? user.item_id.toString() : "",
-            custom_item: ""
+            role_id: roleResponse.data.find((r: Role) => r.category === user.role)?.role_id.toString() || '',
+            password: '',
           });
+        } else {
+          toast.error('User not found', { position: 'top-right' });
+          navigate('/users');
         }
 
         setRoles(roleResponse.data || []);
-        setItems(itemResponse.data || []);
-
-        if (user) {
-          const role = roleResponse.data.find((r: any) => r.category === user.role);
-          setFormData(prev => ({
-            ...prev,
-            role_id: role ? role.role_id.toString() : ""
-          }));
-        }
       } catch (error) {
-        toast.error("Failed to fetch user data or dropdown options");
-        navigate("/users");
+        toast.error('Failed to fetch user data or roles', { position: 'top-right' });
+        navigate('/users');
       }
     };
     fetchData();
@@ -94,94 +64,41 @@ export default function EditUser() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: "" }));
-    }
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: '' }));
   };
 
-  const validateForm = () => {
-    let isValid = true;
-    const newErrors = {
-      name: "", email: "", status: "", role_id: "", password: "",
-      nida: "", address: "", sex: "", date_of_birth: "", contact: "",
-      auto_number: "", item_id: "", custom_item: ""
-    };
+  const validateForm = (): boolean => {
+    const newErrors: Partial<FormData> = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
-      isValid = false;
+      newErrors.name = 'Name is required';
     } else if (formData.name.length > 255) {
-      newErrors.name = "Name must not exceed 255 characters";
-      isValid = false;
+      newErrors.name = 'Name must not exceed 255 characters';
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-      isValid = false;
+      newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Email is invalid";
-      isValid = false;
+      newErrors.email = 'Email is invalid';
     } else if (formData.email.length > 255) {
-      newErrors.email = "Email must not exceed 255 characters";
-      isValid = false;
-    }
-
-    if (!formData.status) {
-      newErrors.status = "Status is required";
-      isValid = false;
-    } else if (formData.status.length > 255) {
-      newErrors.status = "Status must not exceed 255 characters";
-      isValid = false;
-    }
-
-    if (!formData.role_id) {
-      newErrors.role_id = "Role is required";
-      isValid = false;
+      newErrors.email = 'Email must not exceed 255 characters';
     }
 
     if (formData.password && formData.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters";
-      isValid = false;
+      newErrors.password = 'Password must be at least 8 characters';
     }
 
-    if (formData.nida && formData.nida.length > 255) {
-      newErrors.nida = "NIDA must not exceed 255 characters";
-      isValid = false;
+    if (!formData.role_id) {
+      newErrors.role_id = 'Role is required';
     }
 
-    if (formData.address && formData.address.length > 255) {
-      newErrors.address = "Address must not exceed 255 characters";
-      isValid = false;
-    }
-
-    if (formData.sex && !['male', 'female', 'other'].includes(formData.sex)) {
-      newErrors.sex = "Sex must be male, female, or other";
-      isValid = false;
-    }
-
-    if (formData.date_of_birth && isNaN(Date.parse(formData.date_of_birth))) {
-      newErrors.date_of_birth = "Invalid date of birth";
-      isValid = false;
-    }
-
-    if (formData.contact && formData.contact.length > 255) {
-      newErrors.contact = "Contact must not exceed 255 characters";
-      isValid = false;
-    }
-
-    if (formData.auto_number && formData.auto_number.length > 255) {
-      newErrors.auto_number = "Auto number must not exceed 255 characters";
-      isValid = false;
-    }
-
-    if (formData.item_id === 'others' && !formData.custom_item.trim()) {
-      newErrors.custom_item = "Custom item category is required when Others is selected";
-      isValid = false;
+    if (!formData.status) {
+      newErrors.status = 'Status is required';
     }
 
     setErrors(newErrors);
-    return isValid;
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -193,145 +110,173 @@ export default function EditUser() {
       const payload = {
         name: formData.name,
         email: formData.email,
-        status: formData.status,
         role_id: parseInt(formData.role_id),
-        nida: formData.nida || null,
-        address: formData.address || null,
-        sex: formData.sex || null,
-        date_of_birth: formData.date_of_birth || null,
-        contact: formData.contact || null,
-        auto_number: formData.auto_number || null,
-        item_id: formData.item_id && formData.item_id !== 'others' ? parseInt(formData.item_id) : null,
-        ...(formData.password && { password: formData.password })
+        status: formData.status,
+        ...(formData.password && { password: formData.password }),
       };
-
       const response = await axiosInstance.put(`/api/update-user/${userId}`, payload);
-      if (response.status === 200) {
-        toast.success(response.data.message || "User updated successfully");
-        setTimeout(() => navigate("/users"), 3000);
-      }
+      toast.success(response.data.message || 'User updated successfully', {
+        position: 'top-right',
+      });
+      setTimeout(() => navigate('/users'), 2000);
     } catch (error: any) {
-      const errorResponse = error.response?.data;
-      if (errorResponse?.errors) {
-        setErrors(prev => ({ ...prev, ...errorResponse.errors }));
-      }
-      const errorMessage = errorResponse?.message || "Failed to update user";
-      toast.error(errorMessage);
+      const errorMessage = error.response?.data?.message || 'Failed to update user';
+      const backendErrors = error.response?.data?.errors || {};
+      setErrors(backendErrors);
+      toast.error(errorMessage, { position: 'top-right' });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="p-4 w-full mx-auto">
-      <ToastContainer position="top-right" autoClose={3000} style={{ top: "70px" }} closeOnClick pauseOnHover draggable draggablePercent={60} hideProgressBar closeButton />
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <h2 className="text-lg mb-6">Edit User</h2>
+    <div className="p-4 sm:p-6 lg:p-8 w-full mx-auto">
+      <ToastContainer position="top-right" autoClose={3000} style={{ top: '70px' }} />
+      <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 lg:p-8 w-full">
+        <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-gray-800 mb-6">Edit User</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name *</label>
-            <input type="text" name="name" value={formData.name} onChange={handleChange} className={`w-full p-2 border rounded-md ${errors.name ? 'border-red-500' : 'border-gray-300'}`} required maxLength={255} />
-            {errors.name && <p className="mt-1 text-sm text-red-500">{errors.name}</p>}
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+              Name *
+            </label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500 p-2 sm:p-3 lg:p-4 text-sm sm:text-base"
+              placeholder="Enter user name"
+              maxLength={255}
+              aria-invalid={!!errors.name}
+              aria-describedby={errors.name ? 'name-error' : undefined}
+            />
+            {errors.name && (
+              <p id="name-error" className="mt-1 text-sm text-red-500">{errors.name}</p>
+            )}
           </div>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email *</label>
-            <input type="email" name="email" value={formData.email} onChange={handleChange} className={`w-full p-2 border rounded-md ${errors.email ? 'border-red-500' : 'border-gray-300'}`} required maxLength={255} />
-            {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email}</p>}
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              Email *
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500 p-2 sm:p-3 lg:p-4 text-sm sm:text-base"
+              placeholder="Enter user email"
+              maxLength={255}
+              aria-invalid={!!errors.email}
+              aria-describedby={errors.email ? 'email-error' : undefined}
+            />
+            {errors.email && (
+              <p id="email-error" className="mt-1 text-sm text-red-500">{errors.email}</p>
+            )}
           </div>
           <div>
-            <label htmlFor="status" className="block text-sm font-medium text-gray-700">Status *</label>
-            <select name="status" value={formData.status} onChange={handleChange} className={`w-full p-2 border rounded-md ${errors.status ? 'border-red-500' : 'border-gray-300'}`} required>
-              <option value="">Select status</option>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              Password
+            </label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500 p-2 sm:p-3 lg:p-4 text-sm sm:text-base"
+              placeholder="Enter new password (optional)"
+              aria-invalid={!!errors.password}
+              aria-describedby={errors.password ? 'password-error' : undefined}
+            />
+            {errors.password && (
+              <p id="password-error" className="mt-1 text-sm text-red-500">{errors.password}</p>
+            )}
+          </div>
+          <div>
+            <label htmlFor="role_id" className="block text-sm font-medium text-gray-700">
+              Role *
+            </label>
+            <select
+              id="role_id"
+              name="role_id"
+              value={formData.role_id}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500 p-2 sm:p-3 lg:p-4 text-sm sm:text-base"
+              aria-invalid={!!errors.role_id}
+              aria-describedby={errors.role_id ? 'role_id-error' : undefined}
+            >
+              <option value="">Select a role</option>
+              {roles.map((role) => (
+                <option key={role.role_id} value={role.role_id}>
+                  {role.category}
+                </option>
+              ))}
+            </select>
+            {errors.role_id && (
+              <p id="role_id-error" className="mt-1 text-sm text-red-500">{errors.role_id}</p>
+            )}
+          </div>
+          <div>
+            <label htmlFor="status" className="block text-sm font-medium text-gray-700">
+              Status *
+            </label>
+            <select
+              id="status"
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border border-gray-300 focus:ring-blue-500 focus:border-blue-500 p-2 sm:p-3 lg:p-4 text-sm sm:text-base"
+              aria-invalid={!!errors.status}
+              aria-describedby={errors.status ? 'status-error' : undefined}
+            >
               <option value="is_active">Is Active</option>
               <option value="not_active">Not Active</option>
             </select>
-            {errors.status && <p className="mt-1 text-sm text-red-500">{errors.status}</p>}
+            {errors.status && (
+              <p id="status-error" className="mt-1 text-sm text-red-500">{errors.status}</p>
+            )}
           </div>
-          <div>
-            <label htmlFor="role_id" className="block text-sm font-medium text-gray-700">Role *</label>
-            <select name="role_id" value={formData.role_id} onChange={handleChange} className={`w-full p-2 border rounded-md ${errors.role_id ? 'border-red-500' : 'border-gray-300'}`} required>
-              <option value="">Select a role</option>
-              {roles.map((role: any) => (
-                <option key={role.role_id} value={role.role_id}>{role.category}</option>
-              ))}
-            </select>
-            {errors.role_id && <p className="mt-1 text-sm text-red-500">{errors.role_id}</p>}
-          </div>
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
-            <input type="password" name="password" value={formData.password} onChange={handleChange} className={`w-full p-2 border rounded-md ${errors.password ? 'border-red-500' : 'border-gray-300'}`} placeholder="Enter new password (optional)" />
-            {errors.password && <p className="mt-1 text-sm text-red-500">{errors.password}</p>}
-          </div>
-          <div>
-            <label htmlFor="nida" className="block text-sm font-medium text-gray-700">NIDA</label>
-            <input type="text" name="nida" value={formData.nida} onChange={handleChange} className={`w-full p-2 border rounded-md ${errors.nida ? 'border-red-500' : 'border-gray-300'}`} maxLength={255} />
-            {errors.nida && <p className="mt-1 text-sm text-red-500">{errors.nida}</p>}
-          </div>
-          <div>
-            <label htmlFor="address" className="block text-sm font-medium text-gray-700">Address</label>
-            <input type="text" name="address" value={formData.address} onChange={handleChange} className={`w-full p-2 border rounded-md ${errors.address ? 'border-red-500' : 'border-gray-300'}`} maxLength={255} />
-            {errors.address && <p className="mt-1 text-sm text-red-500">{errors.address}</p>}
-          </div>
-          <div>
-            <label htmlFor="sex" className="block text-sm font-medium text-gray-700">Sex</label>
-            <select name="sex" value={formData.sex} onChange={handleChange} className={`w-full p-2 border rounded-md ${errors.sex ? 'border-red-500' : 'border-gray-300'}`}>
-              <option value="">Select sex</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
-            </select>
-            {errors.sex && <p className="mt-1 text-sm text-red-500">{errors.sex}</p>}
-          </div>
-          <div>
-            <label htmlFor="date_of_birth" className="block text-sm font-medium text-gray-700">Date of Birth</label>
-            <input type="date" name="date_of_birth" value={formData.date_of_birth} onChange={handleChange} className={`w-full p-2 border rounded-md ${errors.date_of_birth ? 'border-red-500' : 'border-gray-300'}`} />
-            {errors.date_of_birth && <p className="mt-1 text-sm text-red-500">{errors.date_of_birth}</p>}
-          </div>
-          <div>
-            <label htmlFor="contact" className="block text-sm font-medium text-gray-700">Contact</label>
-            <input type="text" name="contact" value={formData.contact} onChange={handleChange} className={`w-full p-2 border rounded-md ${errors.contact ? 'border-red-500' : 'border-gray-300'}`} maxLength={255} />
-            {errors.contact && <p className="mt-1 text-sm text-red-500">{errors.contact}</p>}
-          </div>
-          <div>
-            <label htmlFor="auto_number" className="block text-sm font-medium text-gray-700">Auto Number</label>
-            <input type="text" name="auto_number" value={formData.auto_number} onChange={handleChange} className={`w-full p-2 border rounded-md ${errors.auto_number ? 'border-red-500' : 'border-gray-300'}`} maxLength={255} />
-            {errors.auto_number && <p className="mt-1 text-sm text-red-500">{errors.auto_number}</p>}
-          </div>
-          <div>
-            <label htmlFor="item_id" className="block text-sm font-medium text-gray-700">Item</label>
-            <select name="item_id" value={formData.item_id} onChange={handleChange} className={`w-full p-2 border rounded-md ${errors.item_id ? 'border-red-500' : 'border-gray-300'}`}>
-              <option value="">Select an item</option>
-              {items.map((item) => (
-                <option key={item.item_id} value={item.item_id}>{item.item_category}</option>
-              ))}
-              <option value="others">Others</option>
-            </select>
-            {errors.item_id && <p className="mt-1 text-sm text-red-500">{errors.item_id}</p>}
-          </div>
-          {formData.item_id === 'others' && (
-            <div>
-              <label htmlFor="custom_item" className="block text-sm font-medium text-gray-700">Custom Item Category *</label>
-              <input
-                type="text"
-                id="custom_item"
-                name="custom_item"
-                value={formData.custom_item}
-                onChange={handleChange}
-                className={`w-full p-2 border rounded-md ${errors.custom_item ? 'border-red-500' : 'border-gray-300'}`}
-                placeholder="Enter custom item category"
-                maxLength={255}
-              />
-              {errors.custom_item && <p className="mt-1 text-sm text-red-500">{errors.custom_item}</p>}
-            </div>
-          )}
-          <div className="flex justify-end gap-4">
-            <button type="button" onClick={() => navigate("/users")} className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition">Cancel</button>
-            <button type="submit" disabled={loading} className={`bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}>
-              {loading ? "Updating..." : "Update User"}
+          <div className="flex flex-col sm:flex-row justify-end gap-4 mt-6">
+            <button
+              type="button"
+              onClick={() => navigate('/users')}
+              className="w-full sm:w-40 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition text-sm sm:text-base"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className={`w-full sm:w-40 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm sm:text-base ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              {loading ? (
+                <div className="flex items-center justify-center">
+                  <svg
+                    className="animate-spin h-5 w-5 text-white mr-2"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                  Updating...
+                </div>
+              ) : (
+                'Update User'
+              )}
             </button>
           </div>
         </form>
       </div>
     </div>
   );
-}
+};
+
+export default EditUser;

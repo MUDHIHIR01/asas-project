@@ -6,8 +6,8 @@ export default function Home() {
   return (
     <>
       <PageMeta
-        title="MediaSlot Portal"
-        description="MediaSLOT Portal"
+        title="FT"
+        description="FT"
       />
 
       <div className="space-y-6 p-6">

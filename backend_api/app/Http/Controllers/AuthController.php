@@ -3,10 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use App\Models\Department;
 use App\Models\Role;
-use App\Models\Item;
 use App\Models\Cookie;
+use Illuminate\Support\Facades\Log;
 use App\Models\UserLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -32,13 +31,6 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'role_id' => 'nullable|integer',
             'status' => 'nullable|string|max:255',
-            'nida' => 'nullable|string|max:255',
-            'address' => 'nullable|string|max:255',
-            'sex' => 'nullable|string|in:male,female,other',
-            'date_of_birth' => 'nullable|date',
-            'contact' => 'nullable|string|max:255',
-            'auto_number' => 'nullable|string|max:255',
-            'item_id' => 'nullable|integer',
             'email' => 'required|string|email|max:255|unique:users,email',
             'password' => 'required|string|min:8',
         ]);
@@ -79,7 +71,6 @@ class AuthController extends Controller
                 'message' => 'User created successfully. A confirmation email has been sent.',
                 'user' => $user,
             ], 201);
-
         } catch (\Exception $e) {
             \Log::error('User creation failed: ' . $e->getMessage());
             return response()->json([
@@ -204,28 +195,20 @@ class AuthController extends Controller
         return response()->json(['message' => 'Logged out successfully'])->cookie($cookie);
     }
 
-
     public function getLoggedUserProfile(Request $request)
-{
-    // Eager load the 'role' and 'item' relationships
-    $user = $request->user()->load(['role', 'item']);
+    {
+        // Eager load the 'role' relationship
+        $user = $request->user()->load(['role']);
 
-    return response()->json([
-        'user_id' => $user->user_id,
-        'name' => $user->name,
-        'role_id' => $user->role_id,
-        'category' => $user->role->category ?? null, // Fetch role category
-        'status' => $user->status,
-        'nida' => $user->nida,
-        'address' => $user->address,
-        'sex' => $user->sex,
-        'date_of_birth' => $user->date_of_birth,
-        'contact' => $user->contact,
-        'auto_number' => $user->auto_number,
-        'item_category' => $user->item->category ?? null, // Fetch item category
-        'email' => $user->email,
-    ]);
-}
+        return response()->json([
+            'user_id' => $user->user_id,
+            'name' => $user->name,
+            'role_id' => $user->role_id,
+            'category' => $user->role->category ?? null,
+            'status' => $user->status,
+            'email' => $user->email,
+        ]);
+    }
 
     public function getLoggedUserName(Request $request)
     {
@@ -256,13 +239,6 @@ class AuthController extends Controller
             'name' => 'nullable|string|max:255',
             'role_id' => 'nullable|integer',
             'status' => 'nullable|string|max:255',
-            'nida' => 'nullable|string|max:255',
-            'address' => 'nullable|string|max:255',
-            'sex' => 'nullable|string|in:male,female,other',
-            'date_of_birth' => 'nullable|date',
-            'contact' => 'nullable|string|max:255',
-            'auto_number' => 'nullable|string|max:255',
-            'item_id' => 'nullable|integer',
         ]);
 
         if ($validator->fails()) {
@@ -285,13 +261,6 @@ class AuthController extends Controller
         $user->name = $request->name ?? $user->name;
         $user->role_id = $request->role_id ?? $user->role_id;
         $user->status = $request->status ?? $user->status;
-        $user->nida = $request->nida ?? $user->nida;
-        $user->address = $request->address ?? $user->address;
-        $user->sex = $request->sex ?? $user->sex;
-        $user->date_of_birth = $request->date_of_birth ?? $user->date_of_birth;
-        $user->contact = $request->contact ?? $user->contact;
-        $user->auto_number = $request->auto_number ?? $user->auto_number;
-        $user->item_id = $request->item_id ?? $user->item_id;
 
         // Save the user and check if it was successful
         if ($user->save()) {
@@ -314,13 +283,6 @@ class AuthController extends Controller
                              'name' => $user->name,
                              'role_id' => $user->role_id,
                              'status' => $user->status,
-                             'nida' => $user->nida,
-                             'address' => $user->address,
-                             'sex' => $user->sex,
-                             'date_of_birth' => $user->date_of_birth,
-                             'contact' => $user->contact,
-                             'auto_number' => $user->auto_number,
-                             'item_id' => $user->item_id,
                              'email' => $user->email,
                              'role' => optional($user->role)->category,
                              'created_at' => $user->created_at,
@@ -337,8 +299,6 @@ class AuthController extends Controller
             return response()->json(['error' => 'Failed to fetch users.'], 500);
         }
     }
-
-
 
     public function getUsersForDropdown(Request $request)
     {
@@ -362,6 +322,77 @@ class AuthController extends Controller
         }
     }
 
+    public function dropdownUsersByName(Request $request)
+    {
+        try {
+            $users = User::select('user_id', 'name')
+                         ->orderBy('name', 'asc')
+                         ->get()
+                         ->map(function ($user) {
+                             return [
+                                 'user_id' => $user->user_id,
+                                 'name' => $user->name,
+                             ];
+                         });
+
+            return response()->json(['users' => $users], 200);
+        } catch (\Exception $e) {
+            \Log::error('Error fetching users by name for dropdown: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to fetch users for dropdown.'], 500);
+        }
+    }
+
+    public function dropdownUsersByRole(Request $request)
+    {
+        try {
+            $users = User::select('user_id', 'name', 'role_id')
+                         ->with(['role' => function ($query) {
+                             $query->select('role_id', 'category');
+                         }])
+                         ->orderBy('role_id', 'asc')
+                         ->get()
+                         ->map(function ($user) {
+                             return [
+                                 'user_id' => $user->user_id,
+                                 'name' => $user->name,
+                                 'role_id' => $user->role_id,
+                                 'role_category' => optional($user->role)->category,
+                             ];
+                         });
+
+            return response()->json(['users' => $users], 200);
+        } catch (\Exception $e) {
+            \Log::error('Error fetching users by role for dropdown: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to fetch users by role for dropdown.'], 500);
+        }
+    }
+
+    public function getUsersWithRoles(Request $request)
+    {
+        try {
+            $users = User::with(['role' => function ($query) {
+                $query->select('role_id', 'category');
+            }])
+            ->orderBy('user_id', 'desc')
+            ->get()
+            ->map(function ($user) {
+                return [
+                    'user_id' => $user->user_id,
+                    'name' => $user->name,
+                    'role_id' => $user->role_id,
+                    'status' => $user->status,
+                    'email' => $user->email,
+                    'role_category' => optional($user->role)->category,
+                    'created_at' => $user->created_at,
+                ];
+            });
+
+            return response()->json(['users' => $users], 200);
+        } catch (\Exception $e) {
+            \Log::error('Error fetching users with roles: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to fetch users with roles.'], 500);
+        }
+    }
 
     public function showUserById($user_id)
     {
@@ -376,13 +407,6 @@ class AuthController extends Controller
             'name' => $user->name,
             'role_id' => $user->role_id,
             'status' => $user->status,
-            'nida' => $user->nida,
-            'address' => $user->address,
-            'sex' => $user->sex,
-            'date_of_birth' => $user->date_of_birth,
-            'contact' => $user->contact,
-            'auto_number' => $user->auto_number,
-            'item_id' => $user->item_id,
             'email' => $user->email,
             'role' => optional($user->role)->category,
         ], 200);
@@ -398,13 +422,6 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'role_id' => 'required|integer',
             'status' => 'required|string|max:255',
-            'nida' => 'nullable|string|max:255',
-            'address' => 'nullable|string|max:255',
-            'sex' => 'nullable|string|in:male,female,other',
-            'date_of_birth' => 'nullable|date',
-            'contact' => 'nullable|string|max:255',
-            'auto_number' => 'nullable|string|max:255',
-            'item_id' => 'nullable|integer',
             'email' => 'required|string|email|max:255',
             'password' => 'nullable|string|min:8',
         ]);
@@ -458,6 +475,29 @@ class AuthController extends Controller
         } catch (\Exception $e) {
             \Log::error('Error counting users: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to count users.'], 500);
+        }
+    }
+
+    public function storeCookies(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'cookie_data' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        try {
+            $cookie = Cookie::create([
+                'user_id' => $request->user()->user_id,
+                'cookie_data' => $request->cookie_data,
+            ]);
+
+            return response()->json(['message' => 'Cookie stored successfully', 'cookie' => $cookie], 201);
+        } catch (\Exception $e) {
+            \Log::error('Error storing cookie: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to store cookie.'], 500);
         }
     }
 }

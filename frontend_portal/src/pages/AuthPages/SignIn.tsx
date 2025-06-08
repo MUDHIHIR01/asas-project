@@ -6,8 +6,8 @@ export default function SignIn() {
   return (
     <>
       <PageMeta
-        title="MY APP"
-        description="This is React.js SignIn Tables Dashboard page for TailAdmin - React.js Tailwind CSS Admin Dashboard Template"
+        title="MCL"
+        description="Mwananchi communication limited cooperate website"
       />
       <AuthLayout>
         <SignInForm />

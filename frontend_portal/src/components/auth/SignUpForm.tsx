@@ -74,14 +74,7 @@ export default function SignUpForm() {
     <div className="flex shadow-md flex-col flex-1 items-center justify-center min-h-screen p-4 bg-gray-100 dark:bg-gray-900">
       <div className="w-full max-w-md">
         <div style={{ display: "flex", justifyContent: "center" }}>
-          <img
-            width={100}
-            height={48}
-            src="/logo.png"
-            alt="Logo"
-            onClick={handleLogoClick}
-            style={{ cursor: "pointer" }}
-          />
+          <h3 className="font-bold text-[color:white]">MCL</h3>
         </div>
       </div>
 
@@ -153,7 +146,7 @@ export default function SignUpForm() {
 
             <div>
               <Button
-                className="w-full relative"
+                className="w-full relative bg-[color:#1f618d]"
                 size="sm"
                 disabled={isLoading}
               >

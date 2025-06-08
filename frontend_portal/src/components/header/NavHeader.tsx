@@ -17,7 +17,7 @@ export default function NavHeader() {
           <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12h18M3 6h18M3 18h18" />
           </svg>
-          Digital Ad-Slot Portal
+         
         </Link>
 
         <button
@@ -32,7 +32,7 @@ export default function NavHeader() {
         </button>
 
         <div className="hidden md:flex gap-6 items-center">
-          <Link to="/about" className="hover:text-blue-200 flex items-center">
+          <Link to="/" className="hover:text-blue-200 flex items-center">
             <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>

@@ -1,5 +1,5 @@
 import { useState, ChangeEvent, FormEvent } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router-dom";
 import { EyeCloseIcon, EyeIcon } from "../../icons";
 import Label from "../form/Label";
 import Input from "../form/input/InputField";
@@ -17,9 +17,25 @@ export default function SignInForm() {
 
   const navigate = useNavigate();
 
+  const validateForm = () => {
+    if (!email.match(/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/)) {
+      toast.error("Please enter a valid email address", { position: "top-right", autoClose: 3000 });
+      return false;
+    }
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters long", { position: "top-right", autoClose: 3000 });
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // Prevent default form submission
-    e.stopPropagation(); // Stop event bubbling
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!validateForm()) {
+      return;
+    }
 
     setIsLoading(true);
 
@@ -28,43 +44,42 @@ export default function SignInForm() {
         const response = await axiosInstance.post('/api/auth/login', { email, password });
         const successMessage = response.data.message || "Login successful!";
         toast.success(successMessage, { position: "top-right", autoClose: 3000 });
-        // Store data in localStorage
         localStorage.setItem("token", response.data.token as string);
         localStorage.setItem("user", JSON.stringify(response.data.user));
         localStorage.setItem("role_id", response.data.role_id as string);
         setIsLoading(false);
-        navigate("/dashboard"); // Navigate only on success
+        navigate("/dashboard");
       } catch (err) {
         const error = err as import("axios").AxiosError<{ message?: string }>;
         if (error.request && retries > 0) {
           toast.warn("Network issue detected, retrying...", { position: "top-right", autoClose: 1000 });
-          await new Promise((resolve) => setTimeout(resolve, 2000)); // Wait 2s
+          await new Promise((resolve) => setTimeout(resolve, 2000));
           return attemptLogin(retries - 1);
         }
-        throw err; // Rethrow for outer catch
+        throw err;
       }
     };
 
     try {
       await attemptLogin();
     } catch (err) {
-      setIsLoading(false); // Reset loading state on error
+      setIsLoading(false);
       const error = err as import("axios").AxiosError<{ message?: string }>;
       if (error.response) {
         const status = error.response.status;
         const message = error.response.data?.message || "An error occurred";
         switch (status) {
           case 401:
-            toast.error(message, { position: "top-right", autoClose: 3000 }); // "Invalid credentials"
+            toast.error("Invalid email or password", { position: "top-right", autoClose: 3000 });
             break;
           case 403:
-            toast.error(message, { position: "top-right", autoClose: 3000 }); // "Account is not active"
+            toast.error("Account is disabled or access denied", { position: "top-right", autoClose: 3000 });
             break;
           case 500:
-            toast.error(message, { position: "top-right", autoClose: 3000 }); // "An error occurred"
+            toast.error("Server error, please try again later", { position: "top-right", autoClose: 3000 });
             break;
           default:
-            toast.error(message, { position: "top-right", autoClose: 3000 }); // Any other error
+            toast.error(message, { position: "top-right", autoClose: 3000 });
         }
       } else if (error.request) {
         toast.error("Failed to connect to server after retries", { position: "top-right", autoClose: 3000 });
@@ -80,51 +95,45 @@ export default function SignInForm() {
   const handleLogoClick = () => navigate("/");
 
   return (
-    <div className="flex shadow-md flex-col flex-1 items-center justify-center min-h-screen p-4 bg-gray-100 dark:bg-gray-900">
-      <div className="w-full max-w-md">
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <img
-            width={100}
-            height={48}
-            src="/logo.png"
-            alt="Logo"
-            onClick={handleLogoClick}
-            style={{ cursor: "pointer" }}
-          />
-        </div>
-      </div>
-
-      <div
-        className="w-full max-w-md p-8 py-4 bg-white rounded-lg dark:bg-gray-800"
-        style={{
-          boxShadow: "rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px",
-        }}
-      >
-        <div className="mb-5 sm:mb-8">
-          <h1 className="mb-2 text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
-            Sign In
-          </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Enter your email and password to sign in!
-          </p>
+    <section className="flex items-center w-full justify-center h-90 px-4 py-8 min-w-[320px] sm:min-w-[900px] overflow-x-auto bg-[color:#f4f6f6] dark:bg-gray-900">
+      <div className="w-full max-w-lg mx-auto">
+        {/* Logo Section */}
+        <div className="flex justify-center mb-8">
+          <button onClick={handleLogoClick} className="focus:outline-none">
+            <h3 className="font-bold text-[color:#2471a3]">MCL</h3>
+          </button>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="space-y-6">
+        {/* Form Container */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 sm:p-8">
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl font-bold text-[color:#1f618d] dark:text-white mb-2">
+              Sign In
+            </h1>
+            <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">
+              Enter your email and password to sign in
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Email Field */}
             <div>
               <Label>
-                Email <span className="text-error-500">*</span>
+                Email <span className="text-red-500">*</span>
               </Label>
               <Input
                 placeholder="info@gmail.com"
                 value={email}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+                disabled={isLoading}
+                className="w-full rounded-lg border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 py-2.5 sm:py-3 text-sm sm:text-base"
               />
             </div>
 
+            {/* Password Field */}
             <div>
               <Label>
-                Password <span className="text-error-500">*</span>
+                Password <span className="text-red-500">*</span>
               </Label>
               <div className="relative">
                 <Input
@@ -132,80 +141,88 @@ export default function SignInForm() {
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                  disabled={isLoading}
+                  className="w-full rounded-lg border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-blue-500 py-2.5 sm:py-3 text-sm sm:text-base"
                 />
-                <span
+                <button
+                  type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute z-30 -translate-y-1/2 cursor-pointer right-4 top-1/2"
+                  className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
                   {showPassword ? (
-                    <EyeIcon className="fill-gray-500 dark:fill-gray-400 size-5" />
+                    <EyeIcon className="h-5 sm:h-6 w-5 sm:w-6 text-gray-500 dark:text-gray-400" />
                   ) : (
-                    <EyeCloseIcon className="fill-gray-500 dark:fill-gray-400 size-5" />
+                    <EyeCloseIcon className="h-5 sm:h-6 w-5 sm:w-6 text-gray-500 dark:text-gray-400" />
                   )}
-                </span>
+                </button>
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
+            {/* Checkbox and Forgot Password */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <Checkbox checked={isChecked} onChange={handleCheckboxChange} />
-                <span className="block font-normal text-gray-700 text-theme-sm dark:text-gray-400">
+                <Checkbox checked={isChecked} onChange={handleCheckboxChange} disabled={isLoading} />
+                <span className="text-sm sm:text-base text-gray-700 dark:text-gray-400">
                   Keep me logged in
                 </span>
               </div>
               <Link
                 to="/request-for/reset-password"
-                className="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400"
+                className="text-sm sm:text-base text-[color:#1f618d] hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-500"
               >
                 Forgot password?
               </Link>
             </div>
 
-            <div>
-              <Button
-                className="w-full relative"
-                size="sm"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <div className="flex items-center justify-center">
-                    <svg
-                      className="animate-spin h-5 w-5 mr-2 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      />
-                    </svg>
-                    Loading...
-                  </div>
-                ) : (
-                  "Sign In"
-                )}
-              </Button>
-            </div>
+            {/* Submit Button */}
+            <Button
+              type="submit"
+              className="w-full bg-[color:#1f618d] hover:bg-blue-700 text-white rounded-lg py-2.5 sm:py-3 text-sm sm:text-base font-semibold transition-colors duration-200"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center" aria-live="polite">
+                  <svg
+                    className="animate-spin h-5 sm:h-6 w-5 sm:w-6 mr-2 sm:mr-3 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                  Loading...
+                </div>
+              ) : (
+                "Sign In"
+              )}
+            </Button>
 
-            <p className="text-center text-sm text-gray-600 dark:text-gray-400 mt-4">
+            {/* Sign Up Link */}
+            <p className="text-center text-sm sm:text-base text-[color:#1f618d] dark:text-gray-400 mt-4 sm:mt-6">
               Don’t have an account?{" "}
-              <Link to="/sign-up" className="text-blue-600 hover:text-blue-700">
+              <Link
+                to="/signup"
+                className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-500"
+              >
                 Sign Up
               </Link>
             </p>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }

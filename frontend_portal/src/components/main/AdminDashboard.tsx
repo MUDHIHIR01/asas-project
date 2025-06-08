@@ -1,126 +1,92 @@
-import { useState, useEffect } from "react";
-import axiosInstance from "../../axios";
-import { NavItem } from "./types";
-import { DashboardCard } from "./DashboardCard";
+import { NavItem } from "./types"; // Assuming NavItem type is defined elsewhere
 
-interface ApiResponse {
-  message?: string;
-  total_slots?: number;
-  total_bookings?: number;
-  total_invoices?: number;
-  total_users?: number;
-  user_roles?: number;
-  error?: string;
-}
+// Define navigation items as specified
+const navItems: NavItem[] = [
+  {
+    name: "Company",
+    icon: (
+      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-pink-600 text-white">
+        🏢
+      </span>
+    ),
+    subItems: [
+      { name: "Home Page", path: "/company" },
+      { name: "FT Group", path: "/company/ft-group" },
+      { name: "Leadership", path: "/company/leadership" },
+      { name: "Diversity and Inclusion", path: "/company/diversity-inclusion" },
+      { name: "Sustainability", path: "/company/sustainability" },
+      { name: "Giving Back", path: "/company/giving-back" },
+      { name: "FT Pink 130", path: "/company/ft-pink-130" },
+      { name: "Our Standards", path: "/company/standards" },
+    ],
+  },
+  {
+    name: "Services",
+    icon: (
+      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-600 text-white">
+        ⚙️
+      </span>
+    ),
+    subItems: [{ name: "Manage Services", path: "/services" }],
+  },
+  {
+    name: "Careers",
+    icon: (
+      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-600 text-white">
+        💼
+      </span>
+    ),
+    subItems: [
+      { name: "Vacancies", path: "/careers/vacancies" },
+      { name: "What We Do", path: "/careers/what-we-do" },
+      { name: "Life at FT Blog", path: "/careers/blog" },
+      { name: "Benefits", path: "/careers/benefits" },
+      { name: "Values", path: "/careers/values" },
+      { name: "Early Careers", path: "/careers/early-careers" },
+      { name: "Join Our Talent Community", path: "/careers/talent-community" },
+    ],
+  },
+  {
+    name: "News",
+    icon: (
+      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-600 text-white">
+        📰
+      </span>
+    ),
+    subItems: [{ name: "Manage News", path: "/news" }],
+  },
+  {
+    name: "Contact",
+    icon: (
+      <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-indigo-600 text-white">
+        📞
+      </span>
+    ),
+    subItems: [{ name: "Manage Contact", path: "/contact" }],
+  },
+];
 
-export default function AdminDashboard() {
-  const [navItems, setNavItems] = useState<NavItem[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  useEffect(() => {
-    const defaultNavItems: NavItem[] = [
-      { title: "Assets On-stocks", count: 500, icon: "📦", bgColor: "bg-indigo-500" },
-      { title: "Requests", count: 120, icon: "📩", bgColor: "bg-red-500" },
-    ];
-
-    const fetchAdminData = async () => {
-      try {
-        const [
-          slotsResponse,
-          bookingsResponse,
-          invoicesResponse,
-          usersResponse,
-          rolesResponse
-        ] = await Promise.all([
-          axiosInstance.get<ApiResponse>("/api/count/ad-slots"),
-          axiosInstance.get<ApiResponse>("/api/count/bookings"),
-          axiosInstance.get<ApiResponse>("/api/count/invoices"),
-          axiosInstance.get<ApiResponse>("/api/count/users"),
-          axiosInstance.get<ApiResponse>("/api/count/roles"),
-        ]);
-
-        return [
-          { 
-            title: "Users", 
-            count: usersResponse.data.total_users || 0, 
-            icon: "👥", 
-            bgColor: "bg-indigo-500" 
-          },
-          { 
-            title: "User Roles", 
-            count: rolesResponse.data.user_roles || 0, 
-            icon: "🛡️", 
-            bgColor: "bg-blue-500" 
-          },
-          { 
-            title: "Ad-slots", 
-            count: slotsResponse.data.total_slots || 0, 
-            icon: "📢", 
-            bgColor: "bg-orange-500" 
-          },
-          { 
-            title: "Bookings", 
-            count: bookingsResponse.data.total_bookings || 0, 
-            icon: "📅", 
-            bgColor: "bg-orange-500" 
-          },
-          { 
-            title: "Invoices", 
-            count: invoicesResponse.data.total_invoices || 0, 
-            icon: "📄", 
-            bgColor: "bg-purple-500" 
-          },
-          { 
-            title: "Payments", 
-            count: 450, // Still static as no API provided
-            icon: "💳", 
-            bgColor: "bg-green-500" 
-          }
-        ];
-      } catch (error) {
-        console.error("Failed to fetch admin data:", error);
-        throw error;
-      }
-    };
-
-    const fetchProfileAndData = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setNavItems(defaultNavItems);
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const [profileResponse, adminData] = await Promise.all([
-          axiosInstance.get("/api/user/profile"),
-          fetchAdminData()
-        ]);
-
-        const userData = profileResponse.data;
-        if (!userData.role_id) {
-          throw new Error("Invalid user data structure");
-        }
-
-        const roleIdNumber = Number(userData.role_id);
-        setNavItems(roleIdNumber === 1 ? adminData : defaultNavItems);
-      } catch (err) {
-        setErrorMessage("Unable to load dashboard data. Please try again later.");
-        setNavItems(defaultNavItems);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfileAndData();
-  }, []);
-
-  if (loading) return <div>Loading...</div>;
-  if (errorMessage) return <div className="text-red-500">{errorMessage}</div>;
+// Component to render individual dashboard card
+function DashboardCard({ item }: { item: NavItem }) {
+  const subItemCount = item.subItems ? item.subItems.length : 0;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-6">
+    <div className="p-4 bg-white rounded-lg shadow-md flex items-center space-x-4 hover:bg-gray-50 transition">
+      <div className="flex-shrink-0">{item.icon}</div>
+      <div>
+        <h3 className="text-lg font-semibold text-gray-800">{item.name}</h3>
+        <p className="text-sm text-gray-600">
+          {subItemCount} {subItemCount === 1 ? "Sub-Item" : "Sub-Items"}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// Main AdminDashboard component
+export default function AdminDashboard() {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-6 bg-gray-100">
       {navItems.map((item, index) => (
         <DashboardCard key={index} item={item} />
       ))}

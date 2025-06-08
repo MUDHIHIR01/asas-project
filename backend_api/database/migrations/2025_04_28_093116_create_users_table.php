@@ -14,15 +14,8 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->increments('user_id');
             $table->string('name');
-            $table->integer('role_id')->default(2); // Changed to integer with default 2
+            $table->integer('role_id')->default(2);
             $table->string('status')->nullable();
-            $table->string('nida')->nullable();
-            $table->string('address')->nullable();
-            $table->string('sex')->nullable();
-            $table->string('date_of_birth')->nullable();
-            $table->string('contact')->nullable();
-            $table->string('auto_number')->nullable();
-            $table->string('item_id')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('email')->unique();
             $table->string('password');

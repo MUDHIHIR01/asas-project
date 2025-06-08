@@ -28,19 +28,53 @@ import CreateUser from "./pages/users/CreateUser";
 import EditUser from "./pages/users/EditUser";
 import UserLogs from "./pages/userlogs/UserLogs";
 import { ReactNode } from "react";
-import CreateItem from "./pages/items/CreateItem";
-import Items from "./pages/items/Items";
-import EditItem from "./pages/items/EditItem";
-import  Questions   from  './pages/questions/Questions'
-import  EditQuestion  from  './pages/questions/EditQuestion'
-import  CreateQuestion  from  './pages/questions/CreateQuestion'
-import  AttemptQuestions  from './pages/questions/AttemptQuestions'
-import UserAttempQs  from './pages/questions/UserAttempQs'
-import  Marks  from  './pages/marks/Marks'
-import  ViewMarks from './pages/marks/ViewMarks'
-import  Reports  from './pages/marks/Reports'
-import  ReportsV1  from './pages/marks/ReportsV1'
-import  UserMarks from './pages/marks/UserMarks'
+import  HomePage from './pages/HomePage'
+import AddAbout from './pages/about/AddAbout'
+import About from './pages/about/About'
+import EditAbout from './pages/about/EditAbout'
+import AddCompHome  from './pages/company/AddCompHome'
+import CompHome from  './pages/company/CompHome'
+import EditCompHome  from './pages/company/EditCompHome'
+import CompLayout  from './pages/CompLayout'
+import AddMCLHome   from './pages/company/mcl-group/AddMCLHome '
+import EditMCLHome  from './pages/company/mcl-group/EditMCLHome'
+import ViewMCLHome  from './pages/company/mcl-group/ViewMCLHome'
+import MCLgroup  from './pages/company/mcl-group/MCLgroup'
+import EditMCLgroup  from './pages/company/mcl-group/EditMCLgroup'
+import AddMCLgroup  from './pages/company/mcl-group/AddMCLgroup'
+import FtHomeLayout  from  './pages/MCLHomeLayout'
+import  AddLeadershipHome from './pages/leadership/AddLeadershipHome'
+import  EditLeadershipHome from './pages/leadership/EditLeadershipHome'
+import  LeadershipHome  from  './pages/leadership/LeadershipHome'
+import LeadershipHomeLayout from './pages/LeadershipHomeLayout'
+import  DiversityHome  from './pages/diversities/DiversityHome'
+import AddDiversityHome  from './pages/diversities/AddDiversityHome'
+import  EditDiversityHome from './pages/diversities/EditDiversityHome'
+import  DiversityAndInclusionLayout  from  './pages/DiversityAndInclusionLayout'
+import Leadership  from './pages/leadership/Leadership'
+import  AddLeadership  from './pages/leadership/AddLeadership'
+import  EditLeadership from './pages/leadership/EditLeadership'
+import  SustainabilityHome  from './pages/sustainability/SustainabilityHome'
+import  AddSustainabilityHome  from './pages/sustainability/AddSustainabilityHome'
+import  EditSustainabilityHome from './pages/sustainability/EditSustainabilityHome'
+import SustainabilityLayout  from './pages/SustainabilityLayout'
+import  Sustainability  from './pages/sustainability/Sustainability'
+import  AddSustainability  from './pages/sustainability/AddSustainability'
+import  EditSustainability  from './pages/sustainability/EditSustainability'
+import ViewGivingHome from './pages/givingback/ViewGivingHome'
+import AddGivingHome   from  './pages/givingback/AddGivingHome'
+import EditGivingHome  from  './pages/givingback/EditGivingHome'
+import  GivingBackLayout  from './pages/GivingBackLayout'
+import  GivingBack  from './pages/givingback/GivingBack'
+import  AddGivingBack  from  './pages/givingback/AddGivingBack' 
+import EditGivingBack  from  './pages/givingback/EditGivingBack'
+import AddFtPink130Home from './pages/pink130/AddPink130Home'
+import  EditFtPink130Home from  './pages/pink130/EditPink130Home'
+import  ViewFtPink130Home  from './pages/pink130/ViewPink130Home'
+import AddPink130 from './pages/pink130/AddPink130'
+import Pink130  from  './pages/pink130/Pink130'
+import  EditPink130   from './pages/pink130/EditPink130'
+
 
 // Define props for ProtectedRoute
 interface ProtectedRouteProps {
@@ -156,32 +190,30 @@ export default function App() {
 />
 
 <Route
-  path="/create-item"
+  path="/add/about"
   element={
     <ProtectedRoute>
-      <CreateItem />
+      <AddAbout />
     </ProtectedRoute>
   }
 
 />
 
-
 <Route
-  path="/items"
+  path="/about"
   element={
     <ProtectedRoute>
-      <Items />
+      <About />
     </ProtectedRoute>
   }
 
 />
 
-
 <Route
-  path="/edit-item/:itemId"
+  path="/edit-about/:aboutId"
   element={
     <ProtectedRoute>
-      <EditItem />
+      <EditAbout />
     </ProtectedRoute>
   }
 />
@@ -189,114 +221,176 @@ export default function App() {
 
 
 <Route
-  path="/create-question"
+  path="/add/company/home"
   element={
     <ProtectedRoute>
-      <CreateQuestion />
-    </ProtectedRoute>
-  }
-
-/>
-
-
-<Route
-  path="/questions"
-  element={
-    <ProtectedRoute>
-      <Questions />
+      <AddCompHome />
     </ProtectedRoute>
   }
 
 />
 
 <Route
-  path="/attemp-questions"
+  path="/company"
   element={
     <ProtectedRoute>
-      <AttemptQuestions />
+      <CompHome />
     </ProtectedRoute>
   }
 
 />
 
 <Route
-  path="//user/attemp-questions"
+  path="/edit-company/:companyId"
   element={
     <ProtectedRoute>
-      <UserAttempQs />
-    </ProtectedRoute>
-  }
-
-/>
-
-
-
-<Route
-  path="/edit-question/:questionId"
-  element={
-    <ProtectedRoute>
-      <EditQuestion />
+      <EditCompHome />
     </ProtectedRoute>
   }
 />
 
 
-<Route
-  path="/view-answers"
-  element={
-    <ProtectedRoute>
-      <Marks />
-    </ProtectedRoute>
-  }
-
-/>
-
+<Route path="/mcl-group/home" element={<ProtectedRoute><ViewMCLHome /></ProtectedRoute>} />
+<Route path="/add/mcl-home" element={<ProtectedRoute><AddMCLHome /></ProtectedRoute>} />
+<Route path="/edit-mcl-home/:mcl_homeId" element={<ProtectedRoute><EditMCLHome /></ProtectedRoute>} />
 
 <Route
-  path="/marks"
+  path="/add/mcl-group"
   element={
     <ProtectedRoute>
-      <ViewMarks />
+      <AddMCLgroup />
     </ProtectedRoute>
   }
 
 />
 
 <Route
-  path="/user-marks"
+  path="/mcl-group"
   element={
     <ProtectedRoute>
-      <UserMarks />
+      <MCLgroup />
     </ProtectedRoute>
   }
 
+/>
+
+ <Route
+    path="/mcl-groups/edit/:mcl_groupId" // The key is `:mcl_groupId`
+    element={
+      <ProtectedRoute>
+        <EditMCLgroup />
+      </ProtectedRoute>
+    }
+  />
+
+<Route
+  path="/add/leadership/home"
+  element={
+    <ProtectedRoute>
+      <AddLeadershipHome />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/leadership/home"
+  element={
+    <ProtectedRoute>
+      <LeadershipHome />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/edit/leadership/home/:leadership_home_id"
+  element={
+    <ProtectedRoute>
+      <EditLeadershipHome />
+    </ProtectedRoute>
+  }
 />
 
 
 <Route
-  path="/reports"
-  element={
-    <ProtectedRoute>
-      <Reports />
-    </ProtectedRoute>
-  }
+      path="/add/sustainability/home"
+      element={
+        <ProtectedRoute>
+          <AddSustainabilityHome />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/sustainability/home"
+      element={
+        <ProtectedRoute>
+          <SustainabilityHome />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/edit/sustainability/home/:sustainability_home_id"
+      element={
+        <ProtectedRoute>
+          <EditSustainabilityHome />
+        </ProtectedRoute>
+      }
+    />
 
-/>
+<Route path="/sustainability" element={<ProtectedRoute><Sustainability /></ProtectedRoute>} />
+<Route path="/add/sustainability" element={<ProtectedRoute><AddSustainability /></ProtectedRoute>} />
+<Route path="/edit-sustainability/:sustainabilityId" element={<ProtectedRoute><EditSustainability /></ProtectedRoute>} />
 
-<Route
-  path="/reports-v1"
-  element={
-    <ProtectedRoute>
-      <ReportsV1 />
-    </ProtectedRoute>
-  }
+<Route path="/leadership" element={<ProtectedRoute><Leadership /></ProtectedRoute>} />
+<Route path="/add/leadership" element={<ProtectedRoute><AddLeadership /></ProtectedRoute>} />
+<Route path="/edit-leadership/:leadershipId" element={<ProtectedRoute><EditLeadership /></ProtectedRoute>} />
 
-/>
-
-
+<Route path="/diversity-and-inclusion" element={<ProtectedRoute><DiversityHome/></ProtectedRoute>} />
+<Route path="/add/diversity-and-inclusion" element={<ProtectedRoute><AddDiversityHome /></ProtectedRoute>} />
+<Route path="/edit-diversity-home/:dhomeId" element={<ProtectedRoute><EditDiversityHome /></ProtectedRoute>} />
 
 
 
+<Route path="/giving-back" element={<ProtectedRoute><ViewGivingHome /></ProtectedRoute>} />
+<Route path="/add/giving-back" element={<ProtectedRoute><AddGivingHome /></ProtectedRoute>} />
+<Route path="/edit-giving-back/:giving_backId" element={<ProtectedRoute><EditGivingHome /></ProtectedRoute>} />
+
+
+ <Route path="/giving/back" element={<ProtectedRoute><GivingBack /></ProtectedRoute>} />
+ <Route path="/add/giving/back" element={<ProtectedRoute><AddGivingBack /></ProtectedRoute>} />
+ <Route path="/edit-giving/back/:givingId" element={<ProtectedRoute><EditGivingBack /></ProtectedRoute>} />
+
+
+
+<Route path="/pink-130" element={<ProtectedRoute><Pink130 /></ProtectedRoute>} />
+<Route path="/add/pink-130" element={<ProtectedRoute><AddPink130 /></ProtectedRoute>} />
+<Route path="/edit-pink-130/:pinkId" element={<ProtectedRoute><EditPink130 /></ProtectedRoute>} />
+          
+          
+          <Route
+            path="/add/mcl-pink-130-home"
+            element={
+              <ProtectedRoute>
+                <AddFtPink130Home
+              />
+            </ProtectedRoute>
+            }
+            />
+          <Route
+            path="/edit-mcl-pink-130-home/:ft_pink_id"
+            element={
+              <ProtectedRoute>
+                <EditFtPink130Home />
+              </ProtectedRoute>
+            }
+            />
+            <Route
+              path="/mcl-pink-130-home"
+              element={
+                <ProtectedRoute>
+                  <ViewFtPink130Home />
+                </ProtectedRoute>
+              }
+            />
 
 
             <Route
@@ -406,7 +500,15 @@ export default function App() {
           </Route>
 
           {/* Public Routes - Auth Layout */}
-          <Route path="/" element={<SignIn />} />
+          <Route path="/" element={<HomePage />} />
+         <Route path="/company/home" element={<CompLayout />} />
+         <Route path="/company/mcl-group" element={<FtHomeLayout />} />
+         <Route path="/company/leadership" element={<LeadershipHomeLayout />} />
+        <Route path="/company/diversity-and-inclusion" element={< DiversityAndInclusionLayout />} />
+        <Route path="/company/sustainability" element={< SustainabilityLayout />} />
+         <Route path="/company/giving-back" element={< GivingBackLayout />} />
+         
+          <Route path="/sign-in" element={<SignIn />} />
           <Route path="/sign-up" element={<SignUp />} />
           <Route path="/reset-password" element={<ResetPass />} />
           <Route path="/request-for/reset-password" element={<RequestForResetPass/>} />
