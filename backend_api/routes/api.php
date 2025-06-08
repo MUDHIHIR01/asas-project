@@ -23,8 +23,10 @@ use App\Http\Controllers\MclGroupController;
 use App\Http\Controllers\DiversityHomeController;
 use App\Http\Controllers\SustainabilityHomeController;
 use App\Http\Controllers\GivingBackHomeController;
-use App\Http\Controllers\FtPink130HomeController;
+use App\Http\Controllers\Pink130HomeController;
 use App\Http\Controllers\Pink130Controller;
+use App\Http\Controllers\OurStandardHomeController;
+
 
 // Public Routes
 Route::get('/login', function () {
@@ -34,7 +36,7 @@ Route::get('/login', function () {
 // Authentication Routes
 Route::post('/auth/add-user', [AuthController::class, 'register']);
 Route::post('/auth/login', [AuthController::class, 'login']);
-// Route::get('/auth/google/redirect', [AuthController::class, 'redirectToGoogle']);
+// Route::get('/auth/google/redirect', [AnuthController::class, 'redirectToGoogle']);
 // Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallback']);
 Route::post('/auth/logout', [AuthController::class, 'logout']);
 Route::post('/auth/request-reset', [PasswordResetController::class, 'requestPasswordReset']);
@@ -47,7 +49,11 @@ Route::get('/leadershipHomeSlider', [LeadershipHomeController::class, 'leadershi
  Route::get('/d-and-inc/homeSlider', [DiversityHomeController::class, 'homeSlider']);
   Route::get('/sust/homeSlider', [SustainabilityHomeController::class, 'sustainabilityHomeSlider']);
    Route::get('/giving-back/slider', [GivingBackHomeController::class, 'givingBackHomeSlider']);
+   Route::get('/pink130Sliders', [Pink130HomeController::class, 'pink130Sliders']);
+   Route::get('/ourStandardHomeSlider', [OurStandardHomeController::class, 'ourStandardHomeSlider']);
  
+
+
 // Protected Routes
 Route::middleware(['auth:sanctum', 'token.expiration'])->group(function () {
     // User Routes
@@ -137,26 +143,27 @@ Route::post('/mcl-pink-130/{mcl_id}/update', [MclPink130Controller::class, 'upda
 Route::delete('/mcl-pink-130/{mcl_id}', [MclPink130Controller::class, 'destroy']);
 
 
-Route::prefix('mcl-pink-130-home')->group(function () {
-    Route::get('/', [FtPink130HomeController::class, 'index']);
-    Route::get('/latest', [FtPink130HomeController::class, 'latest']);
-    Route::post('/', [FtPink130HomeController::class, 'store']);
-    Route::get('/{ft_pink_id}', [FtPink130HomeController::class, 'show']);
-    Route::post('/{ft_pink_id}/update', [FtPink130HomeController::class, 'update']);
-    Route::delete('/{ft_pink_id}', [FtPink130HomeController::class, 'destroy']);
-});
 
 Route::get('/our-standard', [OurStandardController::class, 'index']);
 Route::get('/our-standard/latest', [OurStandardController::class, 'latest']);
 Route::post('/our-standard', [OurStandardController::class, 'store'])->middleware('auth:sanctum');
 Route::get('/our-standard/{our_id}', [OurStandardController::class, 'show']);
-Route::post('/our-standard/{our_id}/update', [OurStandardController::class, 'update'])->middleware('auth:sanctum');
-Route::delete('/our-standard/{our_id}', [OurStandardController::class, 'destroy'])->middleware('auth:sanctum');
+Route::post('/our-standard/{our_id}/update', [OurStandardController::class, 'update']);
+Route::delete('/our-standard/{our_id}', [OurStandardController::class, 'destroy']);
 
+
+Route::prefix('our-standard-home')->group(function () {
+    Route::get('/', [OurStandardHomeController::class, 'index']);
+    Route::get('/latest', [OurStandardHomeController::class, 'latest']);
+    Route::post('/', [OurStandardHomeController::class, 'store']);
+    Route::get('/{id}', [OurStandardHomeController::class, 'show']);
+    Route::post('/{id}/update', [OurStandardHomeController::class, 'update']);
+    Route::delete('/{id}', [OurStandardHomeController::class, 'destroy']);
+});
 
 Route::get('/sub-standard', [SubStandardController::class, 'index']);
 Route::get('/sub-standard/latest', [SubStandardController::class, 'latest']);
-Route::post('/sub-standard', [SubStandardController::class, 'store'])->middleware('auth:sanctum');
+Route::post('/sub-standard', [SubStandardController::class, 'store']);
 Route::get('/sub-standard/{subStandard_id}', [SubStandardController::class, 'show']);
 Route::post('/sub-standard/{subStandard_id}/update', [SubStandardController::class, 'update']);
 Route::delete('/sub-standard/{subStandard_id}', [SubStandardController::class, 'destroy']);
@@ -227,15 +234,21 @@ Route::prefix('pink-130')->group(function () {
     Route::get('/{pink_id}', [Pink130Controller::class, 'show'])->name('pink130.show');
     
     // Protected routes requiring authentication
-    Route::middleware('auth:sanctum')->group(function () {
-        Route::post('/', [Pink130Controller::class, 'store'])->name('pink130.store');
-        Route::post('/{pink_id}/update', [Pink130Controller::class, 'update'])->name('pink130.update');
-        Route::delete('/{pink_id}', [Pink130Controller::class, 'destroy'])->name('pink130.destroy');
-    });
+    Route::post('/', [Pink130Controller::class, 'store'])->name('pink130.store');
+    Route::post('/{pink_id}/update', [Pink130Controller::class, 'update'])->name('pink130.update');
+    Route::delete('/{pink_id}', [Pink130Controller::class, 'destroy'])->name('pink130.destroy');
 });
 
 
 
+Route::prefix('mcl-pink-130-home')->group(function () {
+    Route::get('/', [Pink130HomeController::class, 'index']);
+    Route::get('/latest', [Pink130HomeController::class, 'latest']);
+    Route::post('/', [Pink130HomeController::class, 'store']);
+    Route::get('/{ft_pink_id}', [Pink130HomeController::class, 'show']);
+    Route::post('/{ft_pink_id}/update', [Pink130HomeController::class, 'update']);
+    Route::delete('/{ft_pink_id}', [Pink130HomeController::class, 'destroy']);
+});
 
 
 });

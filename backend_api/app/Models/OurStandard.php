@@ -6,11 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class OurStandard extends Model
 {
-    protected $table = 'our_standard';
+    protected $table = 'our_standards';
     protected $primaryKey = 'our_id';
 
     protected $fillable = [
-        'home_page',
         'standard_category',
         'standard_file',
         'weblink',

@@ -91,7 +91,7 @@ const Header: React.FC = () => {
     { label: "Diversity and Inclusion", path: "/company/diversity-and-inclusion" },
     { label: "Sustainability", path: "/company/sustainability" },
     { label: "Giving Back", path: "/company/giving-back" },
-    { label: "MCL Pink 130", path: "/company/ft-pink-130/home" },
+    { label: "MCL Pink 130", path: "/company/pink-130" },
     { label: "Our Standards", path: "/company/our-standards" },
   ];
 

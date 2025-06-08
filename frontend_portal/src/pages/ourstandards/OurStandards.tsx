@@ -8,34 +8,30 @@ import axiosInstance from '../../axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-// Pink130 data interface
-interface Pink130Data {
-  pink_id: number;
-  category: string;
+interface OurStandardData {
+  our_id: number;
+  standard_category: string;
+  standard_file: string | null;
+  weblink: string | null;
   description: string | null;
-  video: string | null;
-  pdf_file: string | null;
   created_at: string;
-  updated_at?: string;
 }
 
-// Props for ActionButtons
 interface ActionButtonsProps {
-  pinkId: number;
+  ourId: number;
   onDeletionSuccess: () => void;
 }
 
-// Action button component
-const ActionButtons: React.FC<ActionButtonsProps> = ({ pinkId, onDeletionSuccess }) => {
+const ActionButtons: React.FC<ActionButtonsProps> = ({ ourId, onDeletionSuccess }) => {
   const [showConfirm, setShowConfirm] = useState(false);
 
   const handleDelete = async () => {
     try {
-      await axiosInstance.delete(`/api/pink-130/${pinkId}`);
-      toast.success('Pink130 record deleted successfully!', { position: 'top-right' });
+      await axiosInstance.delete(`/api/our-standard/${ourId}`);
+      toast.success('Our Standard record deleted successfully!', { position: 'top-right' });
       onDeletionSuccess();
     } catch (err) {
-      toast.error('Failed to delete pink-130 record.', { position: 'top-right' });
+      toast.error('Failed to delete our standard record.', { position: 'top-right' });
       console.error("Delete error:", err);
     }
     setShowConfirm(false);
@@ -43,7 +39,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ pinkId, onDeletionSuccess
 
   return (
     <div className="relative flex items-center gap-2">
-      <Link to={`/edit-pink-130/${pinkId}`} className="p-1 text-blue-500 hover:text-blue-600" aria-label="Edit">
+      <Link to={`/edit/our_standards/${ourId}`} className="p-1 text-blue-500 hover:text-blue-600" aria-label="Edit">
         <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
           <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
         </svg>
@@ -57,7 +53,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ pinkId, onDeletionSuccess
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50" role="dialog" aria-modal="true">
           <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">Confirm Deletion</h3>
-            <p className="text-sm text-gray-600 mb-6">Are you sure you want to delete this pink-130 record?</p>
+            <p className="text-sm text-gray-600 mb-6">Are you sure you want to delete this our standard record?</p>
             <div className="flex justify-end gap-4">
               <button onClick={() => setShowConfirm(false)} className="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition">No</button>
               <button onClick={handleDelete} className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">Yes, Delete</button>
@@ -69,7 +65,6 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ pinkId, onDeletionSuccess
   );
 };
 
-// Description cell component
 const DescriptionCell: React.FC<{ value: string | null }> = ({ value }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const maxLength = 100;
@@ -92,104 +87,95 @@ const DescriptionCell: React.FC<{ value: string | null }> = ({ value }) => {
   );
 };
 
-// Video cell component
-const VideoCell: React.FC<{ value: string | null }> = ({ value }) => {
-  if (!value) return <span className="text-gray-500 text-xs">No Video</span>;
+const FileCell: React.FC<{ value: string | null }> = ({ value }) => {
+  if (!value) return <span className="text-gray-500 text-xs">No File</span>;
   const baseUrl = axiosInstance.defaults.baseURL || window.location.origin;
-  const videoUrl = `${baseUrl.replace(/\/$/, '')}/${value.replace(/^\//, '')}`;
+  const fileUrl = `${baseUrl.replace(/\/$/, '')}/${value}`;
+
   return (
     <a
-      href={videoUrl}
+      href={fileUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="text-blue-500 hover:text-blue-600 text-sm"
+      className="text-blue-500 hover:text-blue-600 text-sm font-semibold"
+      onError={() => console.warn('Error accessing file:', fileUrl)}
     >
-      View Video
+      View File
     </a>
   );
 };
 
-// PDF cell component
-const PdfCell: React.FC<{ value: string | null }> = ({ value }) => {
-  if (!value) return <span className="text-gray-500 text-xs">No PDF</span>;
-  const baseUrl = axiosInstance.defaults.baseURL || window.location.origin;
-  const pdfUrl = `${baseUrl.replace(/\/$/, '')}/${value.replace(/^\//, '')}`;
-  return (
-    <a
-      href={pdfUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-blue-500 hover:text-blue-600 text-sm"
-    >
-      View PDF
-    </a>
-  );
-};
-
-export default function Pink130() {
-  const [data, setData] = useState<Pink130Data[]>([]);
+export default function OurStandards() {
+  const [data, setData] = useState<OurStandardData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchPink130 = useCallback(async () => {
+  const fetchStandards = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axiosInstance.get<Pink130Data[]>('/api/pink-130');
-      setData(response.data.pink130s || response.data);
+      const response = await axiosInstance.get('/api/our-standard');
+      setData(response.data.our_standard || []);
     } catch (err: any) {
-      const errorMessage = 'Failed to fetch pink-130 records: ' + (err.response?.data?.error || err.message || 'Unknown error');
+      const errorMessage = 'Failed to fetch our standard records: ' + (err.response?.data?.error || err.message || 'Unknown error');
       setError(errorMessage);
-      toast.error('Failed to fetch pink-130 records.');
+      toast.error('Failed to fetch our standard records.');
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchPink130();
-  }, [fetchPink130]);
+    fetchStandards();
+  }, [fetchStandards]);
 
-  const columns: readonly Column<Pink130Data>[] = useMemo(
+  const columns: readonly Column<OurStandardData>[] = useMemo(
     () => [
       {
         Header: '#',
         id: 'rowIndex',
-        Cell: ({ row, flatRows }: CellProps<Pink130Data>) => {
+        Cell: ({ row, flatRows }: CellProps<OurStandardData>) => {
           const originalIndex = flatRows.findIndex(flatRow => flatRow.original === row.original);
           return <span>{originalIndex + 1}</span>;
         },
       },
-      { Header: 'Category', accessor: 'category' },
+      { Header: 'Standard Category', accessor: 'standard_category' },
       {
         Header: 'Description',
         accessor: 'description',
-        Cell: ({ value }: CellProps<Pink130Data, string | null>) => <DescriptionCell value={value} />,
+        Cell: ({ value }: CellProps<OurStandardData, string | null>) => <DescriptionCell value={value} />,
       },
       {
-        Header: 'Video',
-        accessor: 'video',
-        Cell: ({ value }: CellProps<Pink130Data, string | null>) => <VideoCell value={value} />,
+        Header: 'File',
+        accessor: 'standard_file',
+        Cell: ({ value }: CellProps<OurStandardData, string | null>) => <FileCell value={value} />,
       },
       {
-        Header: 'PDF',
-        accessor: 'pdf_file',
-        Cell: ({ value }: CellProps<Pink130Data, string | null>) => <PdfCell value={value} />,
+        Header: 'Weblink',
+        accessor: 'weblink',
+        Cell: ({ value }: CellProps<OurStandardData, string | null>) =>
+          value ? (
+            <a href={value} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-blue-600">
+              Link
+            </a>
+          ) : (
+            <span className="text-gray-500 text-xs">No Link</span>
+          ),
       },
       {
         Header: 'Created At',
         accessor: 'created_at',
-        Cell: ({ value }: CellProps<Pink130Data, string>) => new Date(value).toLocaleDateString(),
+        Cell: ({ value }: CellProps<OurStandardData, string>) => new Date(value).toLocaleDateString(),
       },
       {
         Header: 'Actions',
-        accessor: 'pink_id',
-        Cell: ({ row }: CellProps<Pink130Data>) => (
-          <ActionButtons pinkId={row.original.pink_id} onDeletionSuccess={fetchPink130} />
+        accessor: 'our_id',
+        Cell: ({ row }: CellProps<OurStandardData>) => (
+          <ActionButtons ourId={row.original.our_id} onDeletionSuccess={fetchStandards} />
         ),
       },
     ],
-    [fetchPink130]
+    [fetchStandards]
   );
 
   const tableInstance = useTable(
@@ -216,19 +202,18 @@ export default function Pink130() {
 
   const exportToPDF = () => {
     const doc = new jsPDF();
-    doc.text('Pink130 Records', 20, 10);
+    doc.text('Our Standard Records', 20, 10);
     autoTable(doc, {
-      head: [['#', 'Category', 'Description', 'Video', 'PDF', 'Created At']],
+      head: [['#', 'Standard Category', 'Description', 'Weblink', 'Created At']],
       body: data.map((row, index) => [
         index + 1,
-        row.category,
+        row.standard_category,
         row.description || 'None',
-        row.video ? 'Available' : 'None',
-        row.pdf_file ? 'Available' : 'None',
+        row.weblink || 'None',
         new Date(row.created_at).toLocaleDateString(),
       ]),
     });
-    doc.save('pink130_records.pdf');
+    doc.save('our_standard_records.pdf');
     toast.success('PDF exported successfully!');
   };
 
@@ -236,16 +221,15 @@ export default function Pink130() {
     const worksheet = XLSX.utils.json_to_sheet(
       data.map((row, index) => ({
         '#': index + 1,
-        'Category': row.category,
-        'Description': row.description || 'None',
-        'Video': row.video || 'None',
-        'PDF': row.pdf_file || 'None',
+        'Standard Category': row.standard_category,
+        Description: row.description || 'None',
+        Weblink: row.weblink || 'None',
         'Created At': new Date(row.created_at).toLocaleDateString(),
       }))
     );
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Pink130');
-    XLSX.writeFile(workbook, 'pink130_records.xlsx');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'OurStandards');
+    XLSX.writeFile(workbook, 'our_standard_records.xlsx');
     toast.success('Excel exported successfully!');
   };
 
@@ -254,10 +238,10 @@ export default function Pink130() {
   if (error && data.length === 0) {
     return (
       <div className="flex flex-col justify-center items-center min-h-screen p-4">
-        <div className="text-red-500 text-xl font-semibold mb-4">Error</div>
+        <div className="text-red-500 text-xl font-semibold">Error</div>
         <p className="text-gray-700 mb-2">{error}</p>
         <button
-          onClick={fetchPink130}
+          onClick={fetchStandards}
           className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
         >
           Try Again
@@ -271,12 +255,12 @@ export default function Pink130() {
       <ToastContainer position="top-right" autoClose={3000} newestOnTop closeOnClick pauseOnFocusLoss draggable pauseOnHover theme="colored" />
       <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
-          <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">Pink130 Management</h2>
-          <Link to="/add/pink-130" className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition shadow-md">
+          <h2 className="text-xl sm:text-2xl font-semibold text-gray-800">Our Standards Management</h2>
+          <Link to="/add/our_standards" className="flex items-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition shadow-md">
             <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            Create Pink130 Record
+            Create Our Standard Record
           </Link>
         </div>
 
@@ -310,7 +294,7 @@ export default function Pink130() {
             </thead>
             <tbody {...getTableBodyProps()} className="divide-y divide-gray-200">
               {page.length > 0 ? (
-                page.map((row: Row<Pink130Data>) => {
+                page.map((row: Row<OurStandardData>) => {
                   prepareRow(row);
                   return (
                     <tr {...row.getRowProps()} className="hover:bg-gray-50 transition-colors">
@@ -323,7 +307,7 @@ export default function Pink130() {
                   );
                 })
               ) : (
-                <tr><td colSpan={columns.length} className="text-center py-10 text-gray-500">No pink-130 records found matching your criteria.</td></tr>
+                <tr><td colSpan={columns.length} className="text-center py-10 text-gray-500">No our standard records found matching your criteria.</td></tr>
               )}
             </tbody>
           </table>
@@ -351,7 +335,3 @@ export default function Pink130() {
     </div>
   );
 }
-
-
-
-

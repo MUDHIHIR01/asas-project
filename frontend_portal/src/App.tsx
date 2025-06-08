@@ -74,7 +74,14 @@ import  ViewFtPink130Home  from './pages/pink130/ViewPink130Home'
 import AddPink130 from './pages/pink130/AddPink130'
 import Pink130  from  './pages/pink130/Pink130'
 import  EditPink130   from './pages/pink130/EditPink130'
-
+import Pink130Layout from './pages/Pink130Layout'
+import ViewOurStandardHome  from './pages/ourstandards/ViewOurStandardHome'
+import AddOurStandandardHome from './pages/ourstandards/AddOurStandandardHome'
+import EditOurStandandardHome  from './pages/ourstandards/EditOurStandandardHome'
+import OurStandardsLayout  from './pages/OurStandardsLayout'
+import OurStandards  from './pages/ourstandards/OurStandards'
+import AddOurStandards  from './pages/ourstandards/AddOurStandards'
+import  EditOurStandards  from  './pages/ourstandards/EditOurStandards'
 
 // Define props for ProtectedRoute
 interface ProtectedRouteProps {
@@ -393,6 +400,61 @@ export default function App() {
             />
 
 
+
+
+<Route
+            path="/add/our-standards/home"
+            element={
+              <ProtectedRoute>
+                <AddOurStandandardHome
+              />
+            </ProtectedRoute>
+            }
+            />
+          <Route
+            path="/edit/our-standards/:our_standardid"
+            element={
+              <ProtectedRoute>
+                <EditOurStandandardHome />
+              </ProtectedRoute>
+            }
+            />
+            <Route
+              path="/our-standards/home"
+              element={
+                <ProtectedRoute>
+                  <ViewOurStandardHome/>
+                </ProtectedRoute>
+              }
+            />
+
+
+            <Route
+            path="/add/our_standards"
+            element={
+              <ProtectedRoute>
+                <AddOurStandards
+              />
+            </ProtectedRoute>
+            }
+            />
+          <Route
+            path="/edit/our_standards/:our-standardid"
+            element={
+              <ProtectedRoute>
+                <EditOurStandards />
+              </ProtectedRoute>
+            }
+            />
+            <Route
+              path="/our_standards"
+              element={
+                <ProtectedRoute>
+                  <OurStandards/>
+                </ProtectedRoute>
+              }
+            />
+             
             <Route
               path="/calendar"
               element={
@@ -507,6 +569,8 @@ export default function App() {
         <Route path="/company/diversity-and-inclusion" element={< DiversityAndInclusionLayout />} />
         <Route path="/company/sustainability" element={< SustainabilityLayout />} />
          <Route path="/company/giving-back" element={< GivingBackLayout />} />
+         <Route path="/company/pink-130" element={< Pink130Layout />} />
+         <Route path="/company/our-standards" element={< OurStandardsLayout />} />
          
           <Route path="/sign-in" element={<SignIn />} />
           <Route path="/sign-up" element={<SignUp />} />

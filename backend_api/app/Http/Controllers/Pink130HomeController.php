@@ -7,11 +7,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Exception;
 
-class FtPink130HomeController extends Controller
+class Pink130HomeController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:sanctum')->except(['index', 'show']);
+        $this->middleware('auth:sanctum')->except(['index', 'show','pink130Sliders']);
     }
 
     /**
@@ -27,6 +27,19 @@ class FtPink130HomeController extends Controller
             return response()->json(['error' => 'Failed to fetch ft pink 130 home records.'], 500);
         }
     }
+
+    public function pink130Sliders()
+    {
+        try {
+            $ftPink130Homes = FtPink130Home::orderBy('ft_pink_id', 'desc')->get();
+            return response()->json(['ft_pink_130_homes' => $ftPink130Homes], 200);
+        } catch (Exception $e) {
+            \Log::error('Error fetching ft pink 130 home records: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to fetch ft pink 130 home records.'], 500);
+        }
+    }
+
+
 
     /**
      * Display the latest ft pink 130 home record based on created_at.

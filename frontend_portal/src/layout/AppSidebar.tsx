@@ -108,6 +108,15 @@ const getNavItemsForRole = (roleId: number) => {
             { name: "Manage Leadership", path: "/leadership" }
           ],
          },
+         
+
+          { name: "Our Standards", path: "/company/standards",
+              subItems: [
+              { name: "Our Standards Home", path: "/our-standards/home" },
+            { name: "Manage  Our Standards", path: "/our_standards" }
+          ],
+        },
+
         { name: "Diversity and Inclusion",
            path: "/company/diversity-inclusion" ,
              subItems: [
@@ -134,14 +143,6 @@ const getNavItemsForRole = (roleId: number) => {
               subItems: [
              { name: "MCL Pink 130 Home", path: "/mcl-pink-130-home" },
             { name: "Manage MCL Pink 130", path: "/pink-130" }
-          ],
-        },
-
-
-          { name: "Our Standards", path: "/company/standards",
-              subItems: [
-              { name: "Our Standards Home", path: "/mcl-pink-130-home" },
-            { name: "Manage  Our Standards", path: "/sustainability" }
           ],
         },
 

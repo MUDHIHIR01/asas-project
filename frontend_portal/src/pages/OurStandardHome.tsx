@@ -14,13 +14,13 @@ import {
 } from "@heroicons/react/24/outline";
 
 // --- INTERFACES ---
-interface MCLHomeData {
-  mcl_home_id: number;
+interface OurStandardHomeData {
+  id: number;
   heading: string;
   description: string | null;
-  mcl_home_img: string | null;
+  home_img: string | null;
   created_at: string;
-  updated_at?: string;
+  updated_at: string;
 }
 
 interface FTGroupData {
@@ -42,20 +42,28 @@ interface NewsData {
   created_at: string;
 }
 
+interface ApiResponse {
+  message: string;
+  data: {
+    our_standard_homes: OurStandardHomeData[];
+  };
+  error?: string;
+}
+
 const demoNews: NewsData[] = [
   { id: 1, title: "Company Milestone Achieved", summary: "Our company celebrates a major milestone in innovation and growth.", image_url: null, created_at: "2025-06-01T10:00:00Z" },
   { id: 2, title: "New Product Launch", summary: "Introducing our latest product, designed to revolutionize the industry.", image_url: null, created_at: "2025-05-28T12:00:00Z" },
   { id: 3, title: "Community Outreach Program", summary: "We’re proud to support local communities with our new initiative.", image_url: null, created_at: "2025-05-20T09:00:00Z" },
 ];
 
-// --- Hero Section Component ---
-const CompanySlideshow: React.FC = () => {
-  const [data, setData] = useState<MCLHomeData[]>([]);
+// --- Leadership Hero Section ---
+const LeadershipHomeSlideshow: React.FC = () => {
+  const [data, setData] = useState<OurStandardHomeData[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchSlides = useCallback(async () => {
+  const fetchOurStandardHomes = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -67,26 +75,26 @@ const CompanySlideshow: React.FC = () => {
       if (authToken) {
         headers["Authorization"] = `Bearer ${authToken}`;
       }
-      const response = await axiosInstance.get("/api/sliders", { headers });
-      if (Array.isArray(response.data.data)) {
-        setData(response.data.data);
+      const response = await axiosInstance.get<ApiResponse>("/api/ourStandardHomeSlider", { headers });
+      if (Array.isArray(response.data.data.our_standard_homes)) {
+        setData(response.data.data.our_standard_homes);
       } else {
-        throw new Error("Unexpected response format: Expected an array in 'data'");
+        throw new Error("Unexpected response format");
       }
     } catch (err: any) {
-      const errorMessage =
-        "Failed to fetch slides: " +
-        (err.response?.data?.message || err.message || "Unknown error");
-      setError(errorMessage);
-      toast.error("Failed to fetch slides.");
+      const message =
+        "Failed to fetch Our Standard Homes: " +
+        (err.response?.data?.error || err.message || "Unknown error");
+      setError(message);
+      toast.error("Error fetching Our Standard Homes.");
     } finally {
       setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchSlides();
-  }, [fetchSlides]);
+    fetchOurStandardHomes();
+  }, [fetchOurStandardHomes]);
 
   useEffect(() => {
     if (data.length <= 1) return;
@@ -134,7 +142,7 @@ const CompanySlideshow: React.FC = () => {
         </div>
         <p className="text-gray-200 mb-8 text-lg text-center">{error}</p>
         <button
-          onClick={fetchSlides}
+          onClick={fetchOurStandardHomes}
           className="inline-flex items-center px-8 py-3 bg-indigo-500 text-white rounded-full hover:bg-indigo-600 transition-all duration-300 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-indigo-400"
         >
           <ArrowPathIcon className="w-5 h-5 mr-2" />
@@ -149,7 +157,7 @@ const CompanySlideshow: React.FC = () => {
       <div className="flex justify-center items-center min-h-[80vh] bg-gradient-to-br from-indigo-600 to-purple-700">
         <div className="text-white text-2xl font-semibold flex items-center space-x-3">
           <InformationCircleIcon className="w-8 h-8" />
-          <span>No slides found.</span>
+          <span>No Our Standard Home entries found.</span>
         </div>
       </div>
     );
@@ -184,8 +192,8 @@ const CompanySlideshow: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-transparent z-10" />
           <img
             src={
-              data[currentSlide].mcl_home_img
-                ? `${axiosInstance.defaults.baseURL?.replace(/\/$/, "")}/${data[currentSlide].mcl_home_img?.replace(/^\//, "")}`
+              data[currentSlide].home_img
+                ? `${axiosInstance.defaults.baseURL?.replace(/\/$/, "")}/${data[currentSlide].home_img?.replace(/^\//, "")}`
                 : "https://via.placeholder.com/1200x600?text=No+Image"
             }
             alt={data[currentSlide].heading}
@@ -418,12 +426,12 @@ const NewsSection: React.FC = () => {
   );
 };
 
-// --- Main HomePage Component ---
-const HomePage: React.FC = () => {
+// --- Main LeadershipHomePage Component ---
+const LeadershipHomePage: React.FC = () => {
   return (
     <div className="w-full font-sans">
       <ToastContainer position="top-right" autoClose={3000} newestOnTop closeOnClick pauseOnFocusLoss draggable pauseOnHover theme="colored" />
-      <CompanySlideshow />
+      <LeadershipHomeSlideshow />
       <section className="bg-gray-50 dark:bg-gray-900">
         <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
@@ -440,4 +448,4 @@ const HomePage: React.FC = () => {
   );
 };
 
-export default HomePage;
+export default LeadershipHomePage;
