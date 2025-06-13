@@ -41,34 +41,38 @@ const AddPink130: React.FC = () => {
     setErrors((prev) => ({ ...prev, pdf_file: '' }));
   };
 
-  const validateForm = (): boolean => {
-    const newErrors: Partial<FormData> = {};
+const validateForm = (): boolean => {
+  const newErrors: Partial<FormData> = {};
 
-    if (!formData.category.trim()) {
-      newErrors.category = 'Category is required';
-    } else if (formData.category.length > 255) {
-      newErrors.category = 'Category must not exceed 255 characters';
-    }
+  if (!formData.category.trim()) {
+    newErrors.category = 'Category is required';
+  } else if (formData.category.length > 255) {
+    newErrors.category = 'Category must not exceed 255 characters';
+  }
 
-    if (formData.description && formData.description.length > 1000) {
-      newErrors.description = 'Description must not exceed 1000 characters';
-    }
+  if (formData.description && formData.description.length > 1000) {
+    newErrors.description = 'Description must not exceed 1000 characters';
+  }
 
-    if (formData.video && !/^(https?:\/\/)?([\w\-]+\.)+[\w\-]+(\/[\w\-\/]*)*$/.test(formData.video)) {
-      newErrors.video = 'Please enter a valid URL for the video';
-    } else if (formData.video && formData.video.length > 255) {
-      newErrors.video = 'Video URL must not exceed 255 characters';
-    }
+  // Enhanced video URL validation
+  const videoUrlPattern = /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be|vimeo\.com|dailymotion\.com|facebook\.com|twitch\.tv|video\.google\.com|archive\.org|streamable\.com)\/.+$/i;
 
-    if (formData.pdf_file && formData.pdf_file.type !== 'application/pdf') {
-      newErrors.pdf_file = 'Only PDF files are allowed';
-    } else if (formData.pdf_file && formData.pdf_file.size > 5 * 1024 * 1024) {
-      newErrors.pdf_file = 'PDF file size must not exceed 5MB';
-    }
+  if (formData.video && !videoUrlPattern.test(formData.video)) {
+    newErrors.video = 'Please enter a valid video URL (e.g., YouTube, Vimeo, etc.)';
+  } else if (formData.video && formData.video.length > 255) {
+    newErrors.video = 'Video URL must not exceed 255 characters';
+  }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  if (formData.pdf_file && formData.pdf_file.type !== 'application/pdf') {
+    newErrors.pdf_file = 'Only PDF files are allowed';
+  } else if (formData.pdf_file && formData.pdf_file.size > 5 * 1024 * 1024) {
+    newErrors.pdf_file = 'PDF file size must not exceed 5MB';
+  }
+
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+}
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

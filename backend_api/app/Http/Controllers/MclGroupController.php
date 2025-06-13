@@ -12,7 +12,7 @@ class MclGroupController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:sanctum')->except(['index', 'show', 'latest', 'allMclgroup']);
+        $this->middleware('auth:sanctum')->except(['index', 'show', 'latest', 'allMclgroup','allMclGroups']);
     }
 
     public function index(): JsonResponse
@@ -26,24 +26,39 @@ class MclGroupController extends Controller
         }
     }
 
+    public function allMclGroups(): JsonResponse
+    {
+        try {
+            $mclGroups = MclGroup::orderBy('mcl_id', 'desc')->get();
+            return response()->json(['data' => $mclGroups], 200);
+        } catch (\Exception $e) {
+            \Log::error('Error fetching mcl_groups: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to fetch mcl_groups'], 500);
+        }
+    }
+
+    
+
     public function allMclgroup(): JsonResponse
     {
         return $this->index();
     }
 
+
+
     public function latest(): JsonResponse
-    {
-        try {
-            $latestMclGroup = MclGroup::orderBy('created_at', 'desc')->first();
-            if (!$latestMclGroup) {
-                return response()->json(['message' => 'No MclGroup found'], 404);
-            }
-            return response()->json(['data' => $latestMclGroup], 200);
-        } catch (\Exception $e) {
-            \Log::error('Error fetching latest mcl_group: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to fetch latest mcl_group'], 500);
+{
+    try {
+        $latestMclGroup = MclGroup::orderBy('created_at', 'desc')->first();
+        if (!$latestMclGroup) {
+            return response()->json(['message' => 'No MclGroup found'], 404);
         }
+        return response()->json(['data' => $latestMclGroup], 200);
+    } catch (\Exception $e) {
+        \Log::error('Error fetching latest mcl_group: ' . $e->getMessage());
+        return response()->json(['error' => 'Failed to fetch latest mcl_group'], 500);
     }
+}
 
     public function store(Request $request): JsonResponse
     {

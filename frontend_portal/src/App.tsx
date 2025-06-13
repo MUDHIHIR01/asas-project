@@ -82,6 +82,36 @@ import OurStandardsLayout  from './pages/OurStandardsLayout'
 import OurStandards  from './pages/ourstandards/OurStandards'
 import AddOurStandards  from './pages/ourstandards/AddOurStandards'
 import  EditOurStandards  from  './pages/ourstandards/EditOurStandards'
+import  ServicesHome from './pages/services/ServicesHome'
+import  AddServicesHome from './pages/services/AddServicesHome'
+import  EditServicesHome from './pages/services/EditServicesHome'
+import  Service  from  './pages/services/Service'
+import AddService  from './pages/services/AddService'
+import  EditService  from  './pages/services/EditService'
+import   ServicesLayout  from './pages/ServicesLayout'
+import  NewsHome  from './pages/news/NewsHome.tsx'
+import AddNewsHome from './pages/news/AddNewsHome'
+import  EditNewsHome  from './pages/news/EditNewsHome'
+import  NewsHomeLayout from  './pages/NewsHomeLayout'
+import  AddNews  from './pages/news/AddNews'
+import  EditNews from './pages/news/EditNews'
+import  News from './pages/news/News'
+import  SubNews  from './pages/news/SubNews'
+import  AddSubNews  from './pages/news/AddSubNews'
+import  EditSubNews  from './pages/news/EditSubNews'
+import ContactHome  from './pages/contact/ContactHome'
+import AddContactHome  from './pages/contact/AddContactHome'
+import  EditContactHome  from './pages/contact/EditContactHome'
+import  ContactUs  from  './pages/contact/ContactUs'
+import  AddContactUs  from './pages/contact/AddContactUs.tsx'
+import  EditContactUs from './pages/contact/EditContactUs.tsx'
+import ContactLayout from  './pages/ContactLayout'
+import  DiversityInlcusion from './pages/diversities/DiversityInlcusion'
+import AddDiversityInclusion  from './pages/diversities/AddDiversityInclusion'
+import  EditDiversityInlcusion  from './pages/diversities/EditDiversityInlcusion'
+import  ContactUsInfo  from './pages/contact/ContactUsInfo'
+import AddContactUsInfo  from  './pages/contact/AddContactUsInfo'
+import  EditContactUsInfo  from './pages/contact/EditContactUsInfo'
 
 // Define props for ProtectedRoute
 interface ProtectedRouteProps {
@@ -355,6 +385,10 @@ export default function App() {
 <Route path="/add/diversity-and-inclusion" element={<ProtectedRoute><AddDiversityHome /></ProtectedRoute>} />
 <Route path="/edit-diversity-home/:dhomeId" element={<ProtectedRoute><EditDiversityHome /></ProtectedRoute>} />
 
+<Route path="/diversityInclusion" element={<ProtectedRoute><DiversityInlcusion/></ProtectedRoute>} />
+<Route path="/add/diversityInclusion" element={<ProtectedRoute><AddDiversityInclusion /></ProtectedRoute>} />
+<Route path="/edit-diversityInclusion/:dinc_Id" element={<ProtectedRoute><EditDiversityInlcusion /></ProtectedRoute>} />
+
 
 
 <Route path="/giving-back" element={<ProtectedRoute><ViewGivingHome /></ProtectedRoute>} />
@@ -454,7 +488,224 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
-             
+
+
+
+            <Route
+          path="/services/home"
+          element={
+            <ProtectedRoute>
+              <ServicesHome />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/add/services/home"
+          element={
+            <ProtectedRoute>
+              <AddServicesHome />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/edit-serviceshome/:services_homeId"
+          element={
+            <ProtectedRoute>
+              <EditServicesHome />
+            </ProtectedRoute>
+          }
+        />
+   
+
+    <Route
+  path="/services"
+  element={
+    <ProtectedRoute>
+      <Service />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/services/add"
+  element={
+    <ProtectedRoute>
+      <AddService />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/services/edit/:serviceId"
+  element={
+    <ProtectedRoute>
+      <EditService />
+    </ProtectedRoute>
+  }
+/>
+
+
+
+          <Route
+  path="/news/home"
+  element={
+    <ProtectedRoute>
+      <NewsHome />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/add/news/home"
+  element={
+    <ProtectedRoute>
+      <AddNewsHome />
+    </ProtectedRoute>
+  }
+/>
+
+
+<Route
+  path="/edit/news/home/:news_home_id"
+  element={
+    <ProtectedRoute>
+      <EditNewsHome />
+    </ProtectedRoute>
+  }
+/>
+
+
+
+
+     <Route
+          path="/news"
+          element={
+            <ProtectedRoute>
+              <News />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/add/news"
+          element={
+            <ProtectedRoute>
+              <AddNews />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/edit/news/:news_id"
+          element={
+            <ProtectedRoute>
+              <EditNews />
+            </ProtectedRoute>
+          }
+        />
+
+
+
+
+    <Route
+  path="/sub-news"
+  element={
+    <ProtectedRoute>
+      <SubNews />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/add/sub-news"
+  element={
+    <ProtectedRoute>
+      <AddSubNews />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/edit/sub-news/:subnews_id"
+  element={
+    <ProtectedRoute>
+      <EditSubNews />
+    </ProtectedRoute>
+  }
+/>
+
+
+   <Route
+      path="/contact/home"
+      element={
+        <ProtectedRoute>
+          <ContactHome />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/add/contact/home"
+      element={
+        <ProtectedRoute>
+          <AddContactHome />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/edit/contact/home/:cont_home_id"
+      element={
+        <ProtectedRoute>
+          <EditContactHome />
+        </ProtectedRoute>
+      }
+    />
+
+
+  <Route
+      path="/contact-us"
+      element={
+        <ProtectedRoute>
+          <ContactUs />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/add/contact-us"
+      element={
+        <ProtectedRoute>
+          <AddContactUs />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/edit/contact-us/:cont_us_id"
+      element={
+        <ProtectedRoute>
+          <EditContactUs />
+        </ProtectedRoute>
+      }
+    />
+
+    
+  <Route
+      path="/contact-us/info"
+      element={
+        <ProtectedRoute>
+          <ContactUsInfo />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/add/contact-us/info"
+      element={
+        <ProtectedRoute>
+          <AddContactUsInfo />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/edit/contact-us/info/:cont_info_id"
+      element={
+        <ProtectedRoute>
+          <EditContactUsInfo />
+        </ProtectedRoute>
+      }
+    />
+
             <Route
               path="/calendar"
               element={
@@ -571,7 +822,9 @@ export default function App() {
          <Route path="/company/giving-back" element={< GivingBackLayout />} />
          <Route path="/company/pink-130" element={< Pink130Layout />} />
          <Route path="/company/our-standards" element={< OurStandardsLayout />} />
-         
+         <Route path="/company/services" element={<  ServicesLayout />} />
+          <Route path="/company/news" element={<  NewsHomeLayout />} />
+          <Route path="/company/contact-us" element={<  ContactLayout />} />
           <Route path="/sign-in" element={<SignIn />} />
           <Route path="/sign-up" element={<SignUp />} />
           <Route path="/reset-password" element={<ResetPass />} />

@@ -12,7 +12,7 @@ class SustainabilityController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:sanctum')->except(['index', 'show']);
+        $this->middleware('auth:sanctum')->except(['index', 'show','latestSustainability','allSustainability']);
     }
 
     /**
@@ -29,10 +29,21 @@ class SustainabilityController extends Controller
         }
     }
 
+    public function allSustainability()
+    {
+        try {
+            $sustainabilityRecords = Sustainability::orderBy('sustain_id', 'desc')->get();
+            return response()->json(['data' => $sustainabilityRecords], 200);
+        } catch (Exception $e) {
+            \Log::error('Error fetching sustainability records: ' . $e->getMessage(), ['exception' => $e]);
+            return response()->json(['error' => 'Failed to fetch sustainability records.'], 500);
+        }
+    }
+
     /**
      * Display the latest sustainability record based on created_at.
      */
-    public function latest()
+    public function latestSustainability()
     {
         try {
             $latestSustainability = Sustainability::orderBy('created_at', 'desc')->first();

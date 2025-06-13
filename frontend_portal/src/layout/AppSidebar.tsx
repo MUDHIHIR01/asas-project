@@ -55,7 +55,7 @@ const getNavItemsForRole = (roleId: number) => {
           🛡️ {/* Shield icon for roles/authority */}
         </span>
       ),
-      subItems: [{ name: "Manage Roles", path: "/user-roles" }],
+      subItems: [{ name: "Roles", path: "/user-roles" }],
     },
     {
       name: "Users",
@@ -64,7 +64,7 @@ const getNavItemsForRole = (roleId: number) => {
           👥 {/* Group icon for users/community */}
         </span>
       ),
-      subItems: [{ name: "Manage Users", path: "/users" }],
+      subItems: [{ name: "Users", path: "/users" }],
     },
     {
       name: "User Logs",
@@ -82,7 +82,7 @@ const getNavItemsForRole = (roleId: number) => {
           ℹ️ {/* Info icon for about us */}
         </span>
       ),
-      subItems: [{ name: "Manage Home Page", path: "/about" }],
+      subItems: [{ name: "Home Page", path: "/about" }],
     },
     {
       name: "Company",
@@ -98,14 +98,14 @@ const getNavItemsForRole = (roleId: number) => {
           path: "/company/mcl-group",
           subItems: [
             { name: "Manage MCL-Home", path: "/mcl-group/home" },
-            { name: "Manage MCL-Group", path: "/mcl-group" }
+            { name: "MCL-Group", path: "/mcl-group" }
           ],
         },
         { name: "Leadership", 
           path: "/company/leadership",
            subItems: [
             { name: "Leadership Home", path: "/leadership/home" },
-            { name: "Manage Leadership", path: "/leadership" }
+            { name: "Leadership", path: "/leadership" }
           ],
          },
          
@@ -113,7 +113,7 @@ const getNavItemsForRole = (roleId: number) => {
           { name: "Our Standards", path: "/company/standards",
               subItems: [
               { name: "Our Standards Home", path: "/our-standards/home" },
-            { name: "Manage  Our Standards", path: "/our_standards" }
+            { name: "Our Standards", path: "/our_standards" }
           ],
         },
 
@@ -121,20 +121,20 @@ const getNavItemsForRole = (roleId: number) => {
            path: "/company/diversity-inclusion" ,
              subItems: [
             { name: "Diversity and Inclusion Home", path: "/diversity-and-inclusion" },
-            { name: "Manage Diversity and Inclusion", path: "/mcl-group" }
+            { name: "Diversity and Inclusion", path: "/diversityInclusion" }
           ],
           },
         { name: "Sustainability", 
           path: "/company/sustainability",
                subItems: [
             { name: "Sustainability Home", path: "/sustainability/home" },
-            { name: "Manage Sustainability", path: "/sustainability" }
+            { name: "Sustainability", path: "/sustainability" }
           ],
          },
         { name: "Giving Back", path: "/sustainability/home",
               subItems: [
-            { name: "Giving Back Home", path: "/giving-back" },
-            { name: "Manage Giving Back", path: "/giving/back" }
+            { name: "Back-Home", path: "/giving-back" },
+            { name: "Giving Back", path: "/giving/back" }
           ],
         },
        
@@ -142,7 +142,7 @@ const getNavItemsForRole = (roleId: number) => {
         { name: "MCL Pink 130", path: "/company/mcl-pink-10",
               subItems: [
              { name: "MCL Pink 130 Home", path: "/mcl-pink-130-home" },
-            { name: "Manage MCL Pink 130", path: "/pink-130" }
+            { name: "MCL Pink 130", path: "/pink-130" }
           ],
         },
 
@@ -155,7 +155,9 @@ const getNavItemsForRole = (roleId: number) => {
           ⚙️ {/* Gear icon for services */}
         </span>
       ),
-      subItems: [{ name: "Manage Services", path: "/services" }],
+      subItems: [{ name: "Services-home", path: "/services/home" },
+        { name: "Services", path: "/services" }
+      ],
     },
     {
       name: "Careers",
@@ -181,7 +183,10 @@ const getNavItemsForRole = (roleId: number) => {
           📰 {/* Newspaper icon for news */}
         </span>
       ),
-      subItems: [{ name: "Manage News", path: "/news" }],
+      subItems: [{ name: "News-Home", path: "/news/home" },
+               { name: "News", path: "/news" },
+                { name: "Sub-News", path: "/sub-news" }
+      ],
     },
     {
       name: "Contact",
@@ -190,7 +195,11 @@ const getNavItemsForRole = (roleId: number) => {
           📞 {/* Phone icon for contact */}
         </span>
       ),
-      subItems: [{ name: "Manage Contact", path: "/contact" }],
+      subItems: [{ name: "Contac-us home", path: "/contact/home" },
+                 { name: "Contact-us", path: "/contact-us" },
+                 { name: "Contact Info", path: "/contact-us/info" }
+
+      ],
     },
   ];
 

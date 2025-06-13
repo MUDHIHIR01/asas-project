@@ -11,7 +11,7 @@ class LeadershipController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:sanctum')->except(['index', 'show']);
+        $this->middleware('auth:sanctum')->except(['index', 'show','latestleadership','allLeadership']);
     }
 
     /**
@@ -27,11 +27,21 @@ class LeadershipController extends Controller
             return response()->json(['error' => 'Failed to fetch leadership records.'], 500);
         }
     }
-
+    public function allLeadership()
+    {
+        try {
+            $leadership = Leadership::orderBy('leadership_id', 'desc')->get();
+            return response()->json(['leadership' => $leadership], 200);
+        } catch (Exception $e) {
+            \Log::error('Error fetching leadership records: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to fetch leadership records.'], 500);
+        }
+    }
+   
     /**
      * Display the latest leadership record based on created_at.
      */
-    public function latest()
+    public function latestleadership()
     {
         try {
             $latestLeadership = Leadership::orderBy('created_at', 'desc')->first();

@@ -11,7 +11,7 @@ class GivingBackController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:sanctum')->except(['index', 'show']);
+        $this->middleware('auth:sanctum')->except(['index', 'show','latestGivingBack','allGivingBack']);
     }
 
     /**
@@ -47,10 +47,22 @@ class GivingBackController extends Controller
         }
     }
 
+
+    public function allGivingBack()
+    {
+        try {
+            $givingBackRecords = GivingBack::orderBy('giving_id', 'desc')->get();
+            return response()->json(['giving_back' => $givingBackRecords], 200);
+        } catch (Exception $e) {
+            \Log::error('Error fetching giving back records: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to fetch giving back records.', 'details' => $e->getMessage()], 500);
+        }
+    }
+
     /**
      * Display the latest giving back record based on created_at.
      */
-    public function latest()
+    public function latestGivingBack()
     {
         try {
             $latestGivingBack = GivingBack::orderBy('created_at', 'desc')->first();

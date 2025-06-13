@@ -32,6 +32,7 @@ class CompanyController extends Controller
         }
     }
 
+
         public function homeSliders()
     {
         try {
@@ -44,6 +45,29 @@ class CompanyController extends Controller
             return response()->json(['error' => 'Failed to fetch companies', 'details' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+
+    /**
+ * Fetch the latest company.
+ */
+public function latest()
+{
+    try {
+        \Log::info('Fetching the latest company');
+        $company = Company::orderBy('company_id', 'desc')->first();
+        
+        if (!$company) {
+            \Log::warning('No company found');
+            return response()->json(['error' => 'No company found'], Response::HTTP_NOT_FOUND);
+        }
+        
+        \Log::info('Retrieved latest company: ', $company->toArray());
+        return response()->json($company, Response::HTTP_OK);
+    } catch (Exception $e) {
+        \Log::error('Error fetching latest company: ' . $e->getMessage());
+        return response()->json(['error' => 'Failed to fetch latest company', 'details' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
+}
 
     /**
      * Store a newly created company.

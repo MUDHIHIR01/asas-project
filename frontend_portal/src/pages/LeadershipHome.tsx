@@ -3,15 +3,15 @@ import { useState, useEffect, useCallback } from "react";
 import axiosInstance from "../axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Link } from "react-router-dom";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
   ArrowPathIcon,
   InformationCircleIcon,
-  BuildingOffice2Icon,
-  NewspaperIcon,
+  UserGroupIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
+import Footer from "../components/Footer";
 
 // --- INTERFACES ---
 interface LeadershipHomeData {
@@ -19,36 +19,17 @@ interface LeadershipHomeData {
   heading: string;
   description: string | null;
   home_img: string | null;
-  created_at: string;
-  updated_at: string;
 }
 
-interface FTGroupData {
-  ft_id: number;
-  ft_category: string;
-  image_file: string;
+interface LeadershipData {
+  leadership_id: number;
+  position: string;
+  leader_name: string;
+  leader_image: string | null;
   description: string;
-  weblink: string;
-  home_page: string | null;
-  created_at: string;
-  updated_at: string;
 }
 
-interface NewsData {
-  id: number;
-  title: string;
-  summary: string;
-  image_url: string | null;
-  created_at: string;
-}
-
-const demoNews: NewsData[] = [
-  { id: 1, title: "Company Milestone Achieved", summary: "Our company celebrates a major milestone in innovation and growth.", image_url: null, created_at: "2025-06-01T10:00:00Z" },
-  { id: 2, title: "New Product Launch", summary: "Introducing our latest product, designed to revolutionize the industry.", image_url: null, created_at: "2025-05-28T12:00:00Z" },
-  { id: 3, title: "Community Outreach Program", summary: "We’re proud to support local communities with our new initiative.", image_url: null, created_at: "2025-05-20T09:00:00Z" },
-];
-
-// --- Leadership Hero Section ---
+// --- REFINED: Leadership Hero Section ---
 const LeadershipHomeSlideshow: React.FC = () => {
   const [data, setData] = useState<LeadershipHomeData[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -59,40 +40,21 @@ const LeadershipHomeSlideshow: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const authToken = localStorage.getItem("auth_token") || "";
-      const headers: Record<string, string> = {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      };
-      if (authToken) {
-        headers["Authorization"] = `Bearer ${authToken}`;
-      }
-      const response = await axiosInstance.get("/api/leadershipHomeSlider", { headers });
-      if (Array.isArray(response.data)) {
-        setData(response.data);
-      } else {
-        throw new Error("Unexpected response format");
-      }
+      const response = await axiosInstance.get("/api/leadershipHomeSlider");
+      setData(Array.isArray(response.data) ? response.data : []);
     } catch (err: any) {
-      const message =
-        "Failed to fetch leadership homes: " +
-        (err.response?.data?.message || err.message || "Unknown error");
-      setError(message);
-      toast.error("Error fetching leadership homes.");
+      setError("Failed to fetch leadership data: " + (err.response?.data?.message || err.message));
+      toast.error("Error fetching leadership data.");
     } finally {
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => {
-    fetchLeadershipHomes();
-  }, [fetchLeadershipHomes]);
+  useEffect(() => { fetchLeadershipHomes(); }, [fetchLeadershipHomes]);
 
   useEffect(() => {
     if (data.length <= 1) return;
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % data.length);
-    }, 5000);
+    const interval = setInterval(() => setCurrentSlide((prev) => (prev + 1) % data.length), 5000);
     return () => clearInterval(interval);
   }, [data.length]);
 
@@ -104,14 +66,6 @@ const LeadershipHomeSlideshow: React.FC = () => {
   const contentVariants = {
     hidden: { opacity: 0, y: 30 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
-  };
-  const particleVariants = {
-    animate: {
-      y: [0, -20, 0],
-      opacity: [0.3, 0.9, 0.3],
-      scale: [1, 1.4, 1],
-      transition: { duration: 4, repeat: Infinity, repeatType: "loop", ease: "easeInOut" },
-    },
   };
 
   if (loading) {
@@ -125,123 +79,38 @@ const LeadershipHomeSlideshow: React.FC = () => {
     );
   }
 
-  if (error && data.length === 0) {
+  if (error || data.length === 0) {
     return (
       <div className="flex flex-col justify-center items-center min-h-[80vh] bg-gradient-to-br from-indigo-600 to-purple-700 p-6">
         <div className="text-rose-300 text-3xl font-bold mb-6 flex items-center space-x-3">
           <InformationCircleIcon className="w-8 h-8" />
-          <span>Oops, Something Went Wrong</span>
+          <span>{error ? "An Error Occurred" : "No Content Found"}</span>
         </div>
-        <p className="text-gray-200 mb-8 text-lg text-center">{error}</p>
-        <button
-          onClick={fetchLeadershipHomes}
-          className="inline-flex items-center px-8 py-3 bg-indigo-500 text-white rounded-full hover:bg-indigo-600 transition-all duration-300 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-indigo-400"
-        >
-          <ArrowPathIcon className="w-5 h-5 mr-2" />
-          Try Again
-        </button>
-      </div>
-    );
-  }
-
-  if (data.length === 0) {
-    return (
-      <div className="flex justify-center items-center min-h-[80vh] bg-gradient-to-br from-indigo-600 to-purple-700">
-        <div className="text-white text-2xl font-semibold flex items-center space-x-3">
-          <InformationCircleIcon className="w-8 h-8" />
-          <span>No leadership home entries found.</span>
-        </div>
+        <p className="text-gray-200 mb-8 text-lg text-center">{error || "No leadership data was found."}</p>
+        {error && <button onClick={fetchLeadershipHomes} className="inline-flex items-center px-8 py-3 text-white rounded-full hover:brightness-90 transition-all shadow-lg" style={{ backgroundColor: '#d12814' }}><ArrowPathIcon className="w-5 h-5 mr-2" /> Try Again</button>}
       </div>
     );
   }
 
   return (
     <section className="relative min-h-[80vh] w-full overflow-hidden bg-gradient-to-br from-indigo-600 to-purple-700">
-      {[...Array(30)].map((_, index) => (
-        <motion.div
-          key={index}
-          className="absolute w-2 h-2 bg-cyan-300 rounded-full opacity-30"
-          style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            width: `${Math.random() * 5 + 2}px`,
-            height: `${Math.random() * 5 + 2}px`,
-          }}
-          variants={particleVariants}
-          animate="animate"
-          initial={{ opacity: 0 }}
-        />
-      ))}
       <AnimatePresence mode="wait">
-        <motion.div
-          key={currentSlide}
-          variants={cardVariants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-          className="absolute inset-0"
-        >
+        <motion.div key={currentSlide} variants={cardVariants} initial="hidden" animate="visible" exit="exit" className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-transparent z-10" />
-          <img
-            src={
-              data[currentSlide].home_img
-                ? `${axiosInstance.defaults.baseURL?.replace(/\/$/, "")}/${data[currentSlide].home_img?.replace(/^\//, "")}`
-                : "https://via.placeholder.com/1200x600?text=No+Image"
-            }
-            alt={data[currentSlide].heading}
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              e.currentTarget.src = "https://via.placeholder.com/1200x600?text=Error";
-              e.currentTarget.alt = "Image load error";
-            }}
-            loading="lazy"
-          />
+          <img src={data[currentSlide].home_img ? `${axiosInstance.defaults.baseURL?.replace(/\/$/, "")}/${data[currentSlide].home_img!.replace(/^\//, "")}` : "https://via.placeholder.com/1200x600?text=Image+Missing"} alt={data[currentSlide].heading} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = "https://via.placeholder.com/1200x600?text=Image+Error"; }} loading="lazy" />
         </motion.div>
       </AnimatePresence>
       <div className="relative z-20 flex flex-col justify-center min-h-[80vh] px-4 sm:px-8">
         <div className="max-w-[50%] text-left ml-12">
-          <motion.h2
-            className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4 tracking-tight break-words"
-            style={{ color: "#FFC107", textShadow: "0 4px 12px rgba(0, 0, 0, 0.4)" }}
-            variants={contentVariants}
-            initial="hidden"
-            animate="visible"
-            transition={{ delay: 0.3 }}
-          >
+          <motion.h2 key={`h2-${currentSlide}`} className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4 tracking-tight" style={{ color: "#d12814", textShadow: "0 4px 12px rgba(0,0,0,0.4)" }} variants={contentVariants} initial="hidden" animate="visible">
             {data[currentSlide].heading}
           </motion.h2>
-          <motion.p
-            className="text-lg sm:text-xl lg:text-2xl text-gray-100 mb-8 leading-relaxed break-words"
-            variants={contentVariants}
-            initial="hidden"
-            animate="visible"
-            transition={{ delay: 0.5 }}
-          >
+          <motion.p key={`p-${currentSlide}`} className="text-lg sm:text-xl text-gray-100 mb-8 leading-relaxed font-semibold" variants={contentVariants} initial="hidden" animate="visible" transition={{ delay: 0.2 }}>
             {data[currentSlide].description || "No description available"}
           </motion.p>
-          <motion.div
-            className="flex space-x-4"
-            variants={contentVariants}
-            initial="hidden"
-            animate="visible"
-            transition={{ delay: 0.7 }}
-          >
-            <button
-              onClick={() => setCurrentSlide((prev) => (prev - 1 + data.length) % data.length)}
-              className="inline-flex items-center px-5 py-3 bg-indigo-500 text-white rounded-full hover:bg-indigo-600 transition-all duration-300 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-indigo-400"
-              aria-label="Previous slide"
-            >
-              <ChevronLeftIcon className="w-5 h-5 mr-2" />
-              Previous
-            </button>
-            <button
-              onClick={() => setCurrentSlide((prev) => (prev + 1) % data.length)}
-              className="inline-flex items-center px-5 py-3 bg-indigo-500 text-white rounded-full hover:bg-indigo-600 transition-all duration-300 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-indigo-400"
-              aria-label="Next slide"
-            >
-              Next
-              <ChevronRightIcon className="w-5 h-5 ml-2" />
-            </button>
+          <motion.div variants={contentVariants} initial="hidden" animate="visible" transition={{ delay: 0.4 }}>
+            <button onClick={() => setCurrentSlide((p) => (p - 1 + data.length) % data.length)} className="inline-flex items-center p-3 text-white rounded-full transition-all shadow-lg hover:brightness-90" style={{ backgroundColor: '#d12814' }} aria-label="Previous"><ChevronLeftIcon className="w-6 h-6" /></button>
+            <button onClick={() => setCurrentSlide((p) => (p + 1) % data.length)} className="ml-4 inline-flex items-center p-3 text-white rounded-full transition-all shadow-lg hover:brightness-90" style={{ backgroundColor: '#d12814' }} aria-label="Next"><ChevronRightIcon className="w-6 h-6" /></button>
           </motion.div>
         </div>
       </div>
@@ -249,171 +118,115 @@ const LeadershipHomeSlideshow: React.FC = () => {
   );
 };
 
-// --- FTGroup Section Component ---
-const FTGroupSection: React.FC = () => {
-  const [ftGroup, setFTGroup] = useState<FTGroupData | null>(null);
-  const [loading, setLoading] = useState(true);
+// --- REFINED: Individual Leader Card Component ---
+const LeadershipCard: React.FC<{ leader: LeadershipData; onImageClick: (imageUrl: string | null) => void }> = ({ leader, onImageClick }) => {
+    const [hasImageError, setHasImageError] = useState(false);
+    const imageUrl = leader.leader_image ? `${axiosInstance.defaults.baseURL?.replace(/\/$/, "")}/${leader.leader_image.replace(/^\//, "")}` : null;
+    const showPlaceholder = hasImageError || !imageUrl;
 
-  const fetchFTGroup = useCallback(async () => {
+    return (
+        <motion.div
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden flex flex-col h-full transition-shadow duration-300 group"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            whileHover={{ y: -8, scale: 1.03, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" }}
+        >
+            <div className="relative">
+                <div className="h-64 w-full cursor-pointer" onClick={() => onImageClick(leader.leader_image)}>
+                    {showPlaceholder ? (
+                        <div className="h-full w-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                            <UserGroupIcon className="w-20 h-20 text-gray-300 dark:text-gray-500" />
+                        </div>
+                    ) : (
+                        <img className="h-full w-full object-cover" src={imageUrl!} alt={leader.leader_name} onError={() => setHasImageError(true)} />
+                    )}
+                </div>
+                <span className="absolute top-2 right-2 text-white text-xs font-bold px-2 py-1 rounded-full" style={{ backgroundColor: '#d12814' }}>
+                    Leadership
+                </span>
+            </div>
+            <div className="p-6 text-left flex-grow flex flex-col">
+                <h3 className="text-xl font-bold" style={{ color: '#d12814' }}>{leader.leader_name}</h3>
+                <p className="font-semibold mb-3" style={{ color: '#0069b4' }}>{leader.position}</p>
+                <p className="text-gray-600 dark:text-gray-300 text-sm flex-grow font-semibold">{leader.description}</p>
+            </div>
+        </motion.div>
+    );
+};
+
+// --- REFINED: Leadership Section Component ---
+const LeadershipSection: React.FC = () => {
+  const [leaders, setLeaders] = useState<LeadershipData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalImage, setModalImage] = useState<string>("");
+
+  const fetchLeaders = useCallback(async () => {
     setLoading(true);
     try {
-      const authToken = localStorage.getItem("auth_token") || "";
-      const headers: Record<string, string> = {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      };
-      if (authToken) {
-        headers["Authorization"] = `Bearer ${authToken}`;
-      }
-      const response = await axiosInstance.get("/api/latest/ft-groups", { headers });
-      if (response.data.ft_group) setFTGroup(response.data.ft_group);
-    } catch (err: any) {
-      toast.warn("Could not fetch featured group.");
+      const response = await axiosInstance.get<{ leadership: LeadershipData[] }>("/api/allLeadership");
+      setLeaders(response.data?.leadership && Array.isArray(response.data.leadership) ? response.data.leadership : []);
+    } catch (err) {
+      toast.error("Could not fetch leadership team.");
     } finally {
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => {
-    fetchFTGroup();
-  }, [fetchFTGroup]);
+  useEffect(() => { fetchLeaders(); }, [fetchLeaders]);
 
-  return (
-    <div>
-      <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-6 flex items-center">
-        <BuildingOffice2Icon className="w-8 h-8 mr-3 text-indigo-600" />
-        Featured Group
-      </h2>
-      {loading ? (
-        <div className="p-6 text-center text-gray-500 dark:text-gray-400">Loading Group...</div>
-      ) : ftGroup ? (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="w-full bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 p-6 flex flex-col h-full"
-        >
-          <img
-            src={
-              ftGroup.image_file
-                ? `${axiosInstance.defaults.baseURL?.replace(/\/$/, "")}/${ftGroup.image_file?.replace(/^\//, "")}`
-                : "https://via.placeholder.com/300x150?text=No+Image"
-            }
-            alt={ftGroup.ft_category}
-            className="w-full h-40 object-cover rounded-md mb-4"
-            onError={(e) => {
-              e.currentTarget.src = "https://via.placeholder.com/300x150?text=Error";
-              e.currentTarget.alt = "Image load error";
-            }}
-            loading="lazy"
-          />
-          <h3 className="text-xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">{ftGroup.ft_category}</h3>
-          <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm leading-relaxed flex-grow">
-            {ftGroup.description.length > 120 ? `${ftGroup.description.slice(0, 120)}...` : ftGroup.description}
-          </p>
-          <div className="mt-auto pt-4 border-t border-gray-200 dark:border-gray-700">
-            <Link
-              to="/company/ft-group"
-              className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-all duration-300 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              Learn More
-              <ChevronRightIcon className="w-4 h-4 ml-2" />
-            </Link>
-          </div>
-        </motion.div>
-      ) : (
-        <div className="p-6 text-center text-gray-500 dark:text-gray-400">No featured group found.</div>
-      )}
-    </div>
-  );
-};
-
-// --- News Section Component ---
-const NewsSection: React.FC = () => {
-  const [newsData, setNewsData] = useState<NewsData[]>([]);
-  const [newsLoading, setNewsLoading] = useState(true);
-
-  const fetchNews = useCallback(async () => {
-    setNewsLoading(true);
-    try {
-      const authToken = localStorage.getItem("auth_token") || "";
-      const headers: Record<string, string> = {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      };
-      if (authToken) {
-        headers["Authorization"] = `Bearer ${authToken}`;
-      }
-      const response = await axiosInstance.get<NewsData[]>("/api/news", { headers });
-      setNewsData(response.data.slice(0, 3));
-    } catch (err: any) {
-      setNewsData(demoNews);
-      toast.warn("Could not fetch latest news. Showing demo content.");
-    } finally {
-      setNewsLoading(false);
+  const openModal = (image: string | null) => {
+    if (image) {
+      setModalImage(`${axiosInstance.defaults.baseURL?.replace(/\/$/, "")}/${image.replace(/^\//, "")}`);
+      setModalOpen(true);
     }
-  }, []);
+  };
 
-  useEffect(() => {
-    fetchNews();
-  }, [fetchNews]);
-
-  const newsCardVariants = {
-    hidden: { opacity: 0, scale: 0.9 },
-    visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: "easeOut" } },
+  const closeModal = () => {
+    setModalOpen(false);
+    setModalImage("");
   };
 
   return (
     <>
-      <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-10 text-center flex items-center justify-center space-x-3">
-        <NewspaperIcon className="w-8 h-8 text-indigo-600" />
-        <span>Latest News</span>
-      </h2>
-      {newsLoading ? (
-        <div className="flex justify-center items-center h-48">
+      <div className="text-center mb-12">
+        <h2 className="text-3xl font-extrabold sm:text-4xl inline-flex items-center" style={{ color: '#d12814' }}>
+          <UserGroupIcon className="w-9 h-9 mr-3" />
+          Our Leadership
+        </h2>
+        <p className="mt-4 text-lg text-[#0069b4] dark:text-gray-400">Meet the dedicated team guiding our company forward.</p>
+      </div>
+
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
           <div className="flex items-center space-x-3 text-xl font-semibold text-gray-600 dark:text-gray-300 animate-pulse">
-            <ArrowPathIcon className="w-6 h-6 animate-spin" />
-            <span>Loading News...</span>
+            <ArrowPathIcon className="w-8 h-8 animate-spin" style={{ color: '#d12814' }} />
+            <span>Loading Leadership...</span>
           </div>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {newsData.map((news, index) => (
-            <motion.div
-              key={news.id}
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
-              variants={newsCardVariants}
-              initial="hidden"
-              animate="visible"
-              transition={{ delay: index * 0.1 }}
-            >
-              <img
-                src={
-                  news.image_url
-                    ? `${axiosInstance.defaults.baseURL?.replace(/\/$/, "")}/${news.image_url?.replace(/^\//, "")}`
-                    : "https://via.placeholder.com/400x200?text=News"
-                }
-                alt={news.title}
-                className="w-full h-40 object-cover"
-                onError={(e) => {
-                  e.currentTarget.src = "https://via.placeholder.com/400x200?text=Error";
-                  e.currentTarget.alt = "Image load error";
-                }}
-                loading="lazy"
-              />
-              <div className="p-6">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{news.title}</h3>
-                <p className="text-gray-600 dark:text-gray-400 text-sm mb-4 leading-relaxed">
-                  {news.summary.length > 120 ? `${news.summary.slice(0, 120)}...` : news.summary}
-                </p>
-                <p className="text-gray-500 dark:text-gray-300 text-xs">
-                  {new Date(news.created_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
-                </p>
-              </div>
-            </motion.div>
+      ) : leaders.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {leaders.map((leader) => (
+            <LeadershipCard key={leader.leadership_id} leader={leader} onImageClick={openModal} />
           ))}
         </div>
+      ) : (
+        <div className="text-center py-10 text-gray-500 dark:text-gray-400">
+          <InformationCircleIcon className="w-12 h-12 mx-auto mb-4" />
+          <p className="text-xl">No leadership team members found.</p>
+        </div>
       )}
+      <AnimatePresence>
+        {modalOpen && (
+          <motion.div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4" onClick={closeModal} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <motion.div className="relative" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }} transition={{ type: "spring", stiffness: 300, damping: 30 }} onClick={(e) => e.stopPropagation()}>
+              <button onClick={closeModal} className="absolute -top-3 -right-3 text-white rounded-full p-2 hover:brightness-90 z-10" style={{ backgroundColor: '#d12814' }}><XMarkIcon className="w-6 h-6" /></button>
+              <img src={modalImage} alt="Full size view" className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl" />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 };
@@ -421,21 +234,17 @@ const NewsSection: React.FC = () => {
 // --- Main LeadershipHomePage Component ---
 const LeadershipHomePage: React.FC = () => {
   return (
-    <div className="w-full font-sans">
+    <div className="w-full font-sans bg-gray-50 dark:bg-gray-900">
       <ToastContainer position="top-right" autoClose={3000} newestOnTop closeOnClick pauseOnFocusLoss draggable pauseOnHover theme="colored" />
       <LeadershipHomeSlideshow />
-      <section className="bg-gray-50 dark:bg-gray-900">
-        <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            <div className="lg:col-span-1">
-              <FTGroupSection />
-            </div>
-            <div className="lg:col-span-2">
-              <NewsSection />
-            </div>
+      <main>
+        <section className="py-16 sm:py-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <LeadershipSection />
           </div>
-        </div>
-      </section>
+        </section>
+      </main>
+      <Footer />
     </div>
   );
 };

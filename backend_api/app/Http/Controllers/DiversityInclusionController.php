@@ -12,7 +12,7 @@ class DiversityInclusionController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:sanctum')->except(['index', 'show']);
+        $this->middleware('auth:sanctum')->except(['index', 'show','latestdiversityinclusion','allDiversitiesAndIclusion']);
     }
 
     /**
@@ -29,10 +29,20 @@ class DiversityInclusionController extends Controller
         }
     }
 
+
+    public function allDiversitiesAndIclusion(){
+          try {
+            $diversityRecords = DiversityInclusion::orderBy('diversity_id', 'desc')->get();
+            return response()->json(['diversity' => $diversityRecords], 200);
+        } catch (Exception $e) {
+            \Log::error('Error fetching diversity records: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to fetch diversity records.'], 500);
+        }
+    }
     /**
      * Display the latest diversity inclusion record based on created_at.
      */
-    public function latest()
+    public function latestdiversityinclusion()
     {
         try {
             $latestDiversity = DiversityInclusion::orderBy('created_at', 'desc')->first();
@@ -72,7 +82,7 @@ class DiversityInclusionController extends Controller
 
             // Handle pdf_file upload
             if ($request->hasFile('pdf_file') && $request->file('pdf_file')->isValid()) {
-                $pdfPath = $request->file('pdf_file')->store('diversity_pdfs', 'public');
+                $pdfPath = $request->file('pdf_file')->store('uploads', 'public');
                 $data['pdf_file'] = $pdfPath;
                 \Log::info('PDF file uploaded: ' . $pdfPath);
             }
@@ -135,7 +145,7 @@ class DiversityInclusionController extends Controller
                     Storage::disk('public')->delete($diversity->pdf_file);
                     \Log::info('Deleted old PDF file: ' . $diversity->pdf_file);
                 }
-                $pdfPath = $request->file('pdf_file')->store('diversity_pdfs', 'public');
+                $pdfPath = $request->file('pdf_file')->store('uploads', 'public');
                 $data['pdf_file'] = $pdfPath;
                 \Log::info('New PDF file uploaded: ' . $pdfPath);
             } else {

@@ -14,12 +14,42 @@ class OurStandardController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:sanctum')->except(['index', 'show']);
+        $this->middleware('auth:sanctum')->except(['index', 'show','latestOurStandard','allOurStandards']);
     }
 
     /**
      * Display a listing of our standard records.
      */
+    public function allOurStandards()
+    {
+        try {
+            // Verify database connection
+            DB::connection()->getPdo();
+            
+            // Check if table exists
+            if (!Schema::hasTable('our_standards')) {
+                \Log::error('Table our_standards does not exist in the database.');
+                return response()->json(['error' => 'Database table not found.'], 500);
+            }
+
+            // Fetch records with explicit fields
+            $ourStandardRecords = OurStandard::select('our_id', 'standard_category', 'standard_file', 'weblink', 'description', 'created_at', 'updated_at')
+                ->orderBy('our_id', 'desc')
+                ->get();
+
+            \Log::info('Successfully fetched our standard records.', ['count' => $ourStandardRecords->count()]);
+
+            return response()->json(['our_standard' => $ourStandardRecords], 200);
+        } catch (Exception $e) {
+            \Log::error('Error fetching our standard records: ' . $e->getMessage(), [
+                'exception' => get_class($e),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json(['error' => 'Failed to fetch our standard records.', 'details' => $e->getMessage()], 500);
+        }
+    }
+
+
     public function index()
     {
         try {
@@ -52,7 +82,7 @@ class OurStandardController extends Controller
     /**
      * Display the latest our standard record based on created_at.
      */
-    public function latest()
+    public function latestOurStandard()
     {
         try {
             // Verify database connection

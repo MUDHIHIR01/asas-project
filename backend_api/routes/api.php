@@ -23,9 +23,19 @@ use App\Http\Controllers\MclGroupController;
 use App\Http\Controllers\DiversityHomeController;
 use App\Http\Controllers\SustainabilityHomeController;
 use App\Http\Controllers\GivingBackHomeController;
+use App\Http\Controllers\NewsController;
 use App\Http\Controllers\Pink130HomeController;
 use App\Http\Controllers\Pink130Controller;
 use App\Http\Controllers\OurStandardHomeController;
+use  App\Http\Controllers\ServicesHomeController;
+use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\NewsHomeController;
+use App\Http\Controllers\API\SubNewsController;
+use App\Http\Controllers\ContactHomeController;
+use App\Http\Controllers\ContactUsController;
+use App\Http\Controllers\API\ContactInfoController;
+
+
 
 
 // Public Routes
@@ -51,8 +61,33 @@ Route::get('/leadershipHomeSlider', [LeadershipHomeController::class, 'leadershi
    Route::get('/giving-back/slider', [GivingBackHomeController::class, 'givingBackHomeSlider']);
    Route::get('/pink130Sliders', [Pink130HomeController::class, 'pink130Sliders']);
    Route::get('/ourStandardHomeSlider', [OurStandardHomeController::class, 'ourStandardHomeSlider']);
- 
-
+     Route::get('/servicesHomeSlider', [ServicesHomeController::class, 'servicesHomeSlider']);
+     Route::get('/news-home-slider', [NewsHomeController::class, 'newsHomeSlider']);
+     Route::get('/contactHomeSlider', [ContactHomeController::class, 'contactHomeSlider']);
+     Route::get('/latest/mcl-groups', [MclGroupController::class, 'latest'])->name('mcl-groups.latest');
+     Route::get('/latest/service', [ServiceController::class, 'latestservice']);
+       Route::get('/latestnew', [NewsController::class, 'latestnew']);
+       Route::get('/latestleadership', [LeadershipController::class, 'latestleadership']);
+       Route::get('/latestdiversityinclusion', [DiversityInclusionController::class, 'latestdiversityinclusion']);
+       Route::get('/latestSustainability', [SustainabilityController::class, 'latestSustainability']);
+       Route::get('/latestGivingBack', [GivingBackController::class, 'latestGivingBack']);
+       Route::get('/latestMclPink130', [Pink130Controller::class, 'latestMclPink130']);
+       Route::get('/latestOurStandard', [OurStandardController::class, 'latestOurStandard']);
+        Route::get('/allMclGroups', [MclGroupController::class, 'allMclgroup'])->name('allMclGroups');
+        Route::get('/allLeadership', [LeadershipController::class, 'allLeadership']);
+        Route::get('/allDiversitiesAndIclusion', [DiversityInclusionController::class, 'allDiversitiesAndIclusion']); 
+        Route::get('/allSustainability', [SustainabilityController::class, 'allSustainability']);
+        Route::get('/allGivingBack', [GivingBackController::class, 'allGivingBack']);
+         Route::get('/allMCLpink', [Pink130Controller::class, 'allMCLpink']);
+         Route::get('/allOurStandards', [OurStandardController::class, 'allOurStandards']);
+        Route::get('/allService', [ServiceController::class, 'allService']);
+         Route::get('/allNews', [NewsController::class, 'allNews']);
+         Route::get('/subNews', [SubNewsController::class, 'subNews']);
+          Route::get('/allContactUs', [ContactUsController::class, 'allContactUs']);
+          Route::get('/contactInfo', [ContactInfoController::class, 'contactInfo']);
+         
+         
+        
 
 // Protected Routes
 Route::middleware(['auth:sanctum', 'token.expiration'])->group(function () {
@@ -92,22 +127,23 @@ Route::get('/leadership/{leadership_id}', [LeadershipController::class, 'show'])
 Route::post('/leadership', [LeadershipController::class, 'store']);
 Route::post('/leadership/{leadership_id}/update', [LeadershipController::class, 'update']);
 Route::delete('/leadership/{leadership_id}', [LeadershipController::class, 'destroy']);
-Route::get('/latest/leadership', [LeadershipController::class, 'latest']);
+
     
     
 
-Route::get('/diversity-inclusion/latest', [DiversityInclusionController::class, 'latest']);
+
 Route::resource('diversity-inclusion', DiversityInclusionController::class);
 Route::post('/diversity-inclusion/{diversity_id}/update', [DiversityInclusionController::class, 'update']);
 
 
 Route::get('/sustainability', [SustainabilityController::class, 'index']);
-Route::get('/sustainability/latest', [SustainabilityController::class, 'latest']);
 Route::post('/sustainability', [SustainabilityController::class, 'store'])->middleware('auth:sanctum');
 Route::get('/sustainability/{sustain_id}', [SustainabilityController::class, 'show']);
 Route::post('/sustainability/{sustain_id}/update', [SustainabilityController::class, 'update']);
 Route::put('/sustainability/{sustain_id}', [SustainabilityController::class, 'update']);
 Route::delete('/sustainability/{sustain_id}', [SustainabilityController::class, 'destroy']);
+
+
 
 Route::prefix('sustainability-homes')->group(function () {
     Route::get('/', [SustainabilityHomeController::class, 'index']);
@@ -118,8 +154,9 @@ Route::prefix('sustainability-homes')->group(function () {
 });
 
 
+
+
 Route::get('/giving-back', [GivingBackController::class, 'index']);
-Route::get('/giving-back/latest', [GivingBackController::class, 'latest']);
 Route::post('/giving-back', [GivingBackController::class, 'store']);
 Route::get('/giving-back/{giving_id}', [GivingBackController::class, 'show']);
 Route::post('/giving-back/{giving_id}/update', [GivingBackController::class, 'update']);
@@ -136,7 +173,7 @@ Route::prefix('giving-back-homes')->group(function () {
 });
 
 Route::get('/mcl-pink-130', [MclPink130Controller::class, 'index']);
-Route::get('/mcl-pink-130/latest', [MclPink130Controller::class, 'latest']);
+
 Route::post('/mcl-pink-130', [MclPink130Controller::class, 'store']);
 Route::get('/mcl-pink-130/{mcl_id}', [MclPink130Controller::class, 'show']);
 Route::post('/mcl-pink-130/{mcl_id}/update', [MclPink130Controller::class, 'update']);
@@ -145,7 +182,6 @@ Route::delete('/mcl-pink-130/{mcl_id}', [MclPink130Controller::class, 'destroy']
 
 
 Route::get('/our-standard', [OurStandardController::class, 'index']);
-Route::get('/our-standard/latest', [OurStandardController::class, 'latest']);
 Route::post('/our-standard', [OurStandardController::class, 'store'])->middleware('auth:sanctum');
 Route::get('/our-standard/{our_id}', [OurStandardController::class, 'show']);
 Route::post('/our-standard/{our_id}/update', [OurStandardController::class, 'update']);
@@ -230,7 +266,7 @@ Route::prefix('diversity-home')->group(function () {
 // API routes for Pink130 resource
 Route::prefix('pink-130')->group(function () {
     Route::get('/', [Pink130Controller::class, 'index'])->name('pink130.index');
-    Route::get('/latest', [Pink130Controller::class, 'latest'])->name('pink130.latest');
+
     Route::get('/{pink_id}', [Pink130Controller::class, 'show'])->name('pink130.show');
     
     // Protected routes requiring authentication
@@ -251,5 +287,84 @@ Route::prefix('mcl-pink-130-home')->group(function () {
 });
 
 
+
+Route::prefix('services-homes')->group(function () {
+    Route::get('/', [ServicesHomeController::class, 'index']);
+    Route::get('/{services_home_id}', [ServicesHomeController::class, 'show']);
+    Route::post('/', [ServicesHomeController::class, 'store']);
+    Route::put('/{services_home_id}', [ServicesHomeController::class, 'update']);
+    Route::delete('/{services_home_id}', [ServicesHomeController::class, 'destroy']);
+  
+});
+
+
+Route::get('/services', [ServiceController::class, 'index']);
+Route::get('/services/{service_id}', [ServiceController::class, 'show']);
+Route::post('/services', [ServiceController::class, 'store']);
+Route::post('/services/{service_id}/update', [ServiceController::class, 'update']);
+Route::delete('/services/{service_id}', [ServiceController::class, 'destroy']);
+
+
+
+Route::get('/news-homes', [NewsHomeController::class, 'index']);
+Route::get('/news-homes/{news_home_id}', [NewsHomeController::class, 'show']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/news-homes', [NewsHomeController::class, 'store']);
+    Route::post('/news-homes/{news_home_id}', [NewsHomeController::class, 'update']); // Changed from PUT to POST
+    Route::delete('/news-homes/{news_home_id}', [NewsHomeController::class, 'destroy']);
+});
+
+Route::prefix('news')->group(function () {
+    Route::get('/', [NewsController::class, 'index']);
+  
+    Route::get('/{news_id}', [NewsController::class, 'show']);
+    Route::post('/', [NewsController::class, 'store'])->middleware('auth:sanctum');
+    Route::post('/{news_id}/update', [NewsController::class, 'update'])->middleware('auth:sanctum');
+    Route::delete('/{news_id}', [NewsController::class, 'destroy'])->middleware('auth:sanctum');
+});
+
+   
+// Existing Routes (Modified for Route Model Binding)
+Route::get('/sub-news', [SubNewsController::class, 'index']);
+Route::post('/sub-news', [SubNewsController::class, 'store']);
+// The parameter name must match the variable name in the controller method ($subNews)
+Route::get('/sub-news/{subNews}', [SubNewsController::class, 'show']);
+Route::post('/sub-news/{subNews}/update', [SubNewsController::class, 'update']);
+Route::delete('/sub-news/{subNews}', [SubNewsController::class, 'destroy']);
+
+
+
+Route::get('/contact-homes', [ContactHomeController::class, 'index']);
+Route::post('/contact-homes', [ContactHomeController::class, 'store']);
+Route::get('/contact-homes/{contactHome}', [ContactHomeController::class, 'show']);
+Route::post('/contact-homes/{contactHome}/update', [ContactHomeController::class, 'update']);
+Route::delete('/contact-homes/{contactHome}', [ContactHomeController::class, 'destroy']);
+
+
+
+    Route::get('/contact-us', [ContactUsController::class, 'index']);
+    Route::get('/contact-us/{contactus_id}', [ContactUsController::class, 'show']);
+    Route::post('/contact-us', [ContactUsController::class, 'store']);
+    Route::post('/contact-us/{contactus_id}', [ContactUsController::class, 'update']);
+    Route::delete('/contact-us/{contactus_id}', [ContactUsController::class, 'destroy']);
+
+    Route::prefix('diversity')->group(function () {
+    // Public routes
+    Route::get('/', [DiversityInclusionController::class, 'index']); // GET /api/diversity
+    Route::get('/latest', [DiversityInclusionController::class, 'latestdiversityinclusion']); // GET /api/diversity/latest
+    Route::get('/{diversity_id}', [DiversityInclusionController::class, 'show']); // GET /api/diversity/{diversity_id}
+
+    // Protected routes (require Sanctum auth)
+    Route::post('/', [DiversityInclusionController::class, 'store']); // POST /api/diversity
+    Route::post('/{diversity_id}', [DiversityInclusionController::class, 'update']); // POST /api/diversity/{diversity_id}
+    Route::delete('/{diversity_id}', [DiversityInclusionController::class, 'destroy']); // DELETE /api/diversity/{diversity_id}
+});
+
+
+Route::apiResource('contact-info', ContactInfoController::class);
+Route::get('/contact-us-dropdown', [ContactUsController::class, 'contactDropDown']);
+
+
+    
 });
 

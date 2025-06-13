@@ -1,36 +1,69 @@
-// src/components/Footer.tsx
-import React from 'react';
+import { Link } from "react-router-dom";
+import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } from "react-icons/fa";
 
 const Footer: React.FC = () => {
   return (
-    <footer className="bg-gray-800 text-white py-8 mt-12">
-      <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div>
-          <h3 className="text-lg font-semibold mb-4">Mwananchi Communications LTD</h3>
-          <p>Plot no: 34/35 Mandela Road,</p>
-          <p>Tabata Relini, Mwananchi,</p>
-          <p>Dar es Salaam, Tanzania</p>
-          <p className="mt-2">Phone: +255 754 780 647</p>
-          <p>Email: <a href="mailto:support@mwananchi.co.tz" className="hover:underline">support@mwananchi.co.tz</a></p>
-          <p>Advertising: <a href="mailto:jtarimo@tz.nationmedia.com" className="hover:underline">jtarimo@tz.nationmedia.com</a></p>
-        </div>
-        <div>
-          <h3 className="text-lg font-semibold mb-4">Our Address</h3>
-          <p>Plot no: 34/35 Mandela Road,</p>
-          <p>Tabata Relini, Mwananchi,</p>
-          <p>Dar es Salaam, Tanzania</p>
-        </div>
-        <div>
-          <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
-          <p>Email Us:</p>
-          <p><a href="mailto:support@mwananchi.co.tz" className="hover:underline">support@mwananchi.co.tz</a></p>
-          <p>Advertising: <a href="mailto:jtarimo@tz.nationmedia.com" className="hover:underline">jtarimo@tz.nationmedia.com</a></p>
-          <p className="mt-2">Call Us:</p>
-          <p>+255 754 780 647</p>
+    // The main footer background. Padding is now handled by the sections inside.
+    <footer className="bg-[#0069b4] text-white">
+      {/* The top, constrained-width section of the footer */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div>
+            <h3 className="text-xl font-bold mb-4">Mwananchi Communications LTD</h3>
+            <p className="text-sm leading-relaxed">
+              Plot no: 34/35 Mandela Road, Tabata Relini,<br />
+              Mwananchi, Dar es Salaam, Tanzania
+            </p>
+            <p className="text-sm mt-4">
+              <span className="font-semibold">Phone:</span> +255 754 780 647<br />
+              <span className="font-semibold">Email:</span> support@mwananchi.co.tz<br />
+              <span className="font-semibold">Advertising:</span> jtarimo@tz.nationmedia.com
+            </p>
+          </div>
+
+          <div>
+            <h3 className="text-xl font-bold mb-4">Our Brands</h3>
+            <ul className="text-sm space-y-2">
+              <li><Link to="/brands/mwanaclick" className="hover:underline">MwanaClick</Link></li>
+              <li><Link to="/brands/mwananchi-newspaper" className="hover:underline">Mwananchi newspaper</Link></li>
+              <li><Link to="/brands/mwanaspoti-newspaper" className="hover:underline">Mwanaspoti newspaper</Link></li>
+              <li><Link to="/brands/the-citizen-newspaper" className="hover:underline">The Citizen newspaper</Link></li>
+              <li><Link to="/brands/mwananchi-courier" className="hover:underline">Mwananchi Courier Services</Link></li>
+              <li><Link to="/brands/mwananchi-events" className="hover:underline">Mwananchi Events</Link></li>
+              <li><Link to="/brands/habari-hub" className="hover:underline">Habari Hub</Link></li>
+              <li><Link to="/brands/citizen-rising-woman" className="hover:underline">The Citizen Rising Woman</Link></li>
+              <li><Link to="/brands/nation-epaper" className="hover:underline">Nation ePaper</Link></li>
+              <li><Link to="/brands/mwananchi-digital" className="hover:underline">Mwananchi Digital</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-xl font-bold mb-4">Our Group Brands</h3>
+            <ul className="text-sm space-y-2">
+              <li><Link to="/group-brands/nation-africa" className="hover:underline">Nation Africa</Link></li>
+              <li><Link to="/group-brands/business-daily-africa" className="hover:underline">Business Daily Africa</Link></li>
+              <li><Link to="/group-brands/epapers" className="hover:underline">EPapers</Link></li>
+              <li><Link to="/group-brands/monitor" className="hover:underline">Monitor</Link></li>
+            </ul>
+
+            <div className="mt-6">
+              <h4 className="text-sm font-semibold mb-2">Follow us</h4>
+              <div className="flex gap-4 text-lg">
+                <a href="https://www.facebook.com/mwananchipapers" target="_blank" rel="noopener noreferrer" className="hover:text-gray-300"><FaFacebookF /></a>
+                <a href="https://twitter.com/mwananchi" target="_blank" rel="noopener noreferrer" className="hover:text-gray-300"><FaTwitter /></a>
+                <a href="https://www.instagram.com/mwananchipapers" target="_blank" rel="noopener noreferrer" className="hover:text-gray-300"><FaInstagram /></a>
+                <a href="https://www.linkedin.com/company/mwananchi-communications-ltd" target="_blank" rel="noopener noreferrer" className="hover:text-gray-300"><FaLinkedinIn /></a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <div className="text-center mt-6 border-t border-gray-700 pt-4">
-        <p>© {new Date().getFullYear()} Mwananchi Communications LTD. All rights reserved.</p>
+      
+      {/* Full-width footer section with red background */}
+      <div className="bg-red-600 border-t border-white/20">
+        <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 text-center">
+          <p className="text-sm">© {new Date().getFullYear()} Mwananchi Communications LTD. All rights reserved.</p>
+        </div>
       </div>
     </footer>
   );

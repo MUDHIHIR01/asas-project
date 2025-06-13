@@ -11,7 +11,7 @@ class Pink130Controller extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:sanctum')->except(['index', 'show']);
+        $this->middleware('auth:sanctum')->except(['index', 'show','allMCLpink']);
     }
 
     /**
@@ -28,10 +28,21 @@ class Pink130Controller extends Controller
         }
     }
 
+     public function allMCLpink()
+    {
+        try {
+            $pink130s = Pink130::orderBy('pink_id', 'desc')->get();
+            return response()->json(['pink130s' => $pink130s], 200);
+        } catch (Exception $e) {
+            \Log::error('Error fetching pink-130 records: ' . $e->getMessage());
+            return response()->json(['error' => 'Failed to fetch pink-130 records.'], 500);
+        }
+    }
+
     /**
      * Display the latest pink-130 record based on created_at.
      */
-    public function latest()
+    public function latestMclPink130()
     {
         try {
             $latestPink130 = Pink130::orderBy('created_at', 'desc')->first();
@@ -57,7 +68,7 @@ class Pink130Controller extends Controller
         $validator = Validator::make($request->all(), [
             'category' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
-            'video' => 'nullable|string|url|max:255',
+            'video' => 'nullable|string',
             'pdf_file' => 'nullable|file|mimes:pdf|max:5120', // 5MB max
         ]);
 
