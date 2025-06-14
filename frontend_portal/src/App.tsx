@@ -130,6 +130,30 @@ import  EditBlog  from './pages/blog/EditBlog'
 import EditSubBlog from './pages/blog/EditSubBlog'
 import SubBlogs  from './pages/blog/SubBlogs'
 import AddSubBlog  from './pages/blog/AddSubBlog'
+import BenefitiesHome  from './pages/benefities/BenefitiesHome'
+import AddBenefitiesHome  from './pages/benefities/AddBenefitiesHome'
+import EditBenefitiesHome from  './pages/benefities/EditBenefitiesHome'
+import  AddBenefit  from './pages/benefities/AddBenefit.tsx'
+import Benefits  from './pages/benefities/Benefits'
+import  EditBenefit  from './pages/benefities/EditBenefit'
+import ValuesHome  from './pages/values/ValuesHome'
+import  AddValueHome  from './pages/values/AddValueHome'
+import  EditValueHome  from './pages/values/EditValueHome'
+import Values from './pages/values/Values';
+import AddValue from './pages/values/AddValue';
+import EditValue from './pages/values/EditValue';
+import StayConnectedHome from './pages/stayconnected/StayConnectedHome';
+import AddStayConnectedHome from './pages/stayconnected/AddStayConnectedHome';
+import EditStayConnectedHome from './pages/stayconnected/EditStayConnectedHome';
+import StayConnected from './pages/stayconnected/StayConnected';
+import AddStayConnected from './pages/stayconnected/AddStayConnected';
+import EditStayConnected from './pages/stayconnected/EditStayConnected';
+import EarycareHome from './pages/earycareer/EarycareHome';
+import AddEarycareHome from './pages/earycareer/AddEarycareHome';
+import EditEarycareHome from './pages/earycareer/EditEarycareHome'
+import EarlyCareers from './pages/earycareer/EarlyCareers';
+import AddEarlyCareer from './pages/earycareer/AddEarlyCareer';
+import EditEarlyCareer from './pages/earycareer/EditEarlyCareer';
 
 // Define props for ProtectedRoute
 interface ProtectedRouteProps {
@@ -875,6 +899,221 @@ export default function App() {
   }
 />
 
+
+
+<Route
+  path="/benefities/home"
+  element={
+    <ProtectedRoute>
+      <BenefitiesHome />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/add/benefityhome"
+  element={
+    <ProtectedRoute>
+      <AddBenefitiesHome />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/edit/benefityhome/:benefityhome_id"
+  element={
+    <ProtectedRoute>
+      <EditBenefitiesHome />
+    </ProtectedRoute>
+  }
+/>
+
+
+
+<Route
+  path="/benefities"
+  element={
+    <ProtectedRoute>
+      <Benefits />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/add/benefity"
+  element={
+    <ProtectedRoute>
+      <AddBenefit />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/edit/benefity/:benefity_id"
+  element={
+    <ProtectedRoute>
+      <EditBenefit />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/value/home"
+  element={
+    <ProtectedRoute>
+      <ValuesHome />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/add/valuehome"
+  element={
+    <ProtectedRoute>
+      <AddValueHome />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/edit/valuehome/:values_home_id"
+  element={
+    <ProtectedRoute>
+      <EditValueHome />
+    </ProtectedRoute>
+  }
+/>
+
+
+
+
+<Route
+  path="/values"
+  element={
+    <ProtectedRoute>
+      <Values />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/add/value"
+  element={
+    <ProtectedRoute>
+      <AddValue />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/edit/value/:value_id"
+  element={
+    <ProtectedRoute>
+      <EditValue />
+    </ProtectedRoute>
+  }
+/>
+
+
+<Route
+  path="/stay-connected/home"
+  element={
+    <ProtectedRoute>
+      <StayConnectedHome />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/add/stayconnected/home"
+  element={
+    <ProtectedRoute>
+      <AddStayConnectedHome />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/edit/stay-connectedhome/:s_connectedhome_id"
+  element={
+    <ProtectedRoute>
+      <EditStayConnectedHome />
+    </ProtectedRoute>
+  }
+/>
+
+
+
+
+<Route
+  path="/stay-connected"
+  element={
+    <ProtectedRoute>
+      <StayConnected />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/add/stay-connected"
+  element={
+    <ProtectedRoute>
+      <AddStayConnected />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/edit/stay-connected/:stay_connected_id"
+  element={
+    <ProtectedRoute>
+      <EditStayConnected />
+    </ProtectedRoute>
+  }
+/>
+        
+
+
+
+<Route
+  path="/early-careers"
+  element={
+    <ProtectedRoute>
+      <EarlyCareers />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/add/early-career"
+  element={
+    <ProtectedRoute>
+      <AddEarlyCareer />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/edit/early-career/:early_career_id"
+  element={
+    <ProtectedRoute>
+      <EditEarlyCareer />
+    </ProtectedRoute>
+  }
+/>
+
+
+
+<Route
+  path="/earycare/home"
+  element={
+    <ProtectedRoute>
+      <EarycareHome />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/add/earycare/home"
+  element={
+    <ProtectedRoute>
+      <AddEarycareHome />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/edit/earycarehome/:earycarehome_id"
+  element={
+    <ProtectedRoute>
+      <EditEarycareHome />
+    </ProtectedRoute>
+  }
+/>
             <Route
               path="/calendar"
               element={

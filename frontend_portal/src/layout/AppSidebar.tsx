@@ -183,10 +183,38 @@ const getNavItemsForRole = (roleId: number) => {
       ],
          },
 
-        { name: "Benefits", path: "/careers/benefits" },
-        { name: "Values", path: "/careers/values" },
-        { name: "Early Careers", path: "/careers/early-careers" },
-        { name: "Join Our Talent Community", path: "/careers/talent-community" },
+
+        { name: "Benefits", path: "/benefities/home",
+          
+            subItems: [
+              { name: "Home page", path: "/benefities/home" },
+        { name: "Benefities", path: "/benefities" },
+      ],
+         },
+
+          { name: "Early Careers", path: "/careers/early-careers" ,
+          
+            subItems: [
+          { name: "Home page", path: "/earycare/home" },
+         { name: "Eary careers", path: "/early-careers" },
+         ],
+          
+        },
+
+        { name: "Values", path: "/careers/values",
+            subItems: [{ name: "Home page", path: "/value/home" },
+         { name: "Values", path: "/values" },
+         ],
+         
+         },
+
+
+        { name: "Join Our Talent Community", path: "/",
+           subItems: [
+              { name: "Home page", path: "/stay-connected/home" },
+        { name: "Stay connected", path: "/stay-connected" },
+      ],
+         },
       ],
     },
     {
@@ -227,26 +255,7 @@ const getNavItemsForRole = (roleId: number) => {
       ),
       subItems: [{ name: "Attempt Questions", path: "/attemp-questions" }],
     },
-    {
-      name: "Marks",
-      icon: (
-        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white">
-          ✅ {/* Checkmark icon for answers */}
-        </span>
-      ),
-      subItems: [{ name: "View Marks", path: "/view-answers" }],
-    },
-    {
-      name: "Get Report",
-      icon: (
-        <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-500 text-white">
-          📄 {/* Document icon for reports */}
-        </span>
-      ),
-      subItems: [
-        { name: "Print Report", path: "/reports-v1" },
-      ],
-    },
+  
   ];
 
   const role3NavItems: NavItem[] = [
