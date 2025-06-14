@@ -4,7 +4,7 @@ import { FaFacebookF, FaTwitter, FaInstagram, FaLinkedinIn } from "react-icons/f
 const Footer: React.FC = () => {
   return (
     // The main footer background. Padding is now handled by the sections inside.
-    <footer className="bg-[#0069b4] text-white">
+    <footer className="sticky top-0 z-50 w-full bg-gradient-to-r from-[#0A51A1] to-[#ff3333] shadow-2xl  text-white">
       {/* The top, constrained-width section of the footer */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -60,7 +60,7 @@ const Footer: React.FC = () => {
       </div>
       
       {/* Full-width footer section with red background */}
-      <div className="bg-red-600 border-t border-white/20">
+      <div className="bg-[#0A51A] border-t border-white/20">
         <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 text-center">
           <p className="text-sm">© {new Date().getFullYear()} Mwananchi Communications LTD. All rights reserved.</p>
         </div>

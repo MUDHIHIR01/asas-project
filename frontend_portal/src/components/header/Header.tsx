@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { motion } from "framer-motion";
 
-// --- INTERFACES --- //
+// Interfaces
 interface NavItem {
   label: string;
   path: string;
@@ -15,11 +15,10 @@ interface DropdownMenuProps {
   onClose: () => void;
 }
 
-// --- SUB-COMPONENTS --- //
-
+// Sub-Components
 const ThemeToggleButton: React.FC = () => {
   const [isDark, setIsDark] = useState<boolean>(
-    () => window.matchMedia("(prefers-color-scheme: dark)").matches
+    window.matchMedia("(prefers-color-scheme: dark)").matches
   );
 
   useEffect(() => {
@@ -29,7 +28,7 @@ const ThemeToggleButton: React.FC = () => {
   return (
     <motion.button
       onClick={() => setIsDark(!isDark)}
-      className="flex items-center justify-center w-12 h-12 text-white rounded-full bg-gradient-to-br from-[#0069b4] to-[#004f8a] transition-all duration-300"
+      className="flex items-center justify-center w-12 h-12 text-white rounded-full bg-gradient-to-br from-[#0A51A1] to-[#ff3333] transition-all duration-300"
       aria-label="Toggle Theme"
       whileHover={{ scale: 1.15, rotate: 15 }}
       whileTap={{ scale: 0.95 }}
@@ -48,13 +47,16 @@ const ThemeToggleButton: React.FC = () => {
 };
 
 const DropdownMenu: React.FC<DropdownMenuProps> = ({ isOpen, items, onClose }) => {
+  const animationProps = {
+    opacity: isOpen ? 1 : 0,
+    y: isOpen ? 0 : -10,
+  };
+
   return (
     <motion.div
-      className={`absolute left-0 mt-2 w-56 bg-gradient-to-b from-[#0069b4] to-[#004f8a] rounded-lg shadow-xl z-50 ${
-        isOpen ? "block" : "hidden"
-      }`}
+      className={`absolute left-0 mt-2 w-56 bg-gradient-to-b from-[#0A51A1] to-[#ff3333] rounded-lg shadow-xl z-50 ${isOpen ? "block" : "hidden"}`}
       initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: isOpen ? 1 : 0, y: isOpen ? 0 : -10 }}
+      animate={animationProps}
       transition={{ duration: 0.3 }}
     >
       <div className="py-2">
@@ -62,7 +64,7 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({ isOpen, items, onClose }) =
           <Link
             key={item.label}
             to={item.path}
-            className="block px-4 py-2 text-sm font-medium text-white hover:bg-white/20 transition-colors duration-200 text-center rounded-md mx-2"
+            className="block px-4 py-2 text-sm font-bold text-white hover:bg-white/20 transition-colors duration-200 text-center rounded-md mx-2"
             onClick={onClose}
           >
             {item.label}
@@ -73,12 +75,12 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({ isOpen, items, onClose }) =
   );
 };
 
-// --- MAIN HEADER COMPONENT --- //
+// Main Header Component
 const Header: React.FC = () => {
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
-  const companyMenuItems = [
+  const companyMenuItems: NavItem[] = [
     { label: "MCL-Group", path: "/company/mcl-group" },
     { label: "Leadership", path: "/company/leadership" },
     { label: "Diversity and Inclusion", path: "/company/diversity-and-inclusion" },
@@ -88,8 +90,8 @@ const Header: React.FC = () => {
     { label: "Our Standards", path: "/company/our-standards" },
   ];
 
-  const careersMenuItems = [
-    { label: "Vacancies", path: "/https://careers.mcl.co.tz/" },
+  const careersMenuItems: NavItem[] = [
+    { label: "Vacancies", path: "https://careers.mcl.co.tz/" },
     { label: "What We Do", path: "/careers/what-we-do" },
     { label: "Life At MCL Blog", path: "/careers/life-at-ft-blog" },
     { label: "Benefits", path: "/careers/benefits" },
@@ -108,37 +110,37 @@ const Header: React.FC = () => {
     { label: "Sign In", path: "/sign-in" },
   ];
 
-  const navLinkClass = "font-extrabold text-white hover:text-[#e6f0fa] transition-colors duration-200";
+  const navLinkClass = "font-black text-white hover:text-[#e6f0fa] transition-colors duration-200 tracking-tight";
 
   return (
     <motion.header
-      className="sticky top-0 z-50 w-full bg-gradient-to-r from-[#0069b4] to-[#004f8a] shadow-2xl py-4"
+      className="sticky top-0 z-50 w-full bg-gradient-to-r from-[#0A51A1] to-[#ff3333] shadow-2xl py-4"
       initial={{ opacity: 0, y: -50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
       <div className="flex items-center justify-between w-full px-8 py-4 mx-auto max-w-8xl lg:px-12">
         <Link to="/" className="flex items-center gap-4">
-          <img src="/logo.png" alt="MCL" className="h-14" />
-          <h3 className="font-extrabold text-white text-lg tracking-tight">
-            Mwananchi Communications LTD
-          </h3>
+          <div className="relative p-2 bg-white/10 rounded-lg backdrop-blur-sm">
+            <img
+              src="/logo.png"
+              alt="MCL"
+              className="h-20 w-auto object-contain brightness-110 contrast-125"
+            />
+          </div>
+          <h3 className="font-black text-white text-xl tracking-tighter">MCL</h3>
         </Link>
         <nav className="items-center hidden gap-8 lg:flex">
-          {/* UPDATED: Loop now handles the "Sign In" button as a special case */}
-          {navItems.map((item) => {
-            if (item.label === "Sign In") {
-              return (
-                <Link
-                  key={item.label}
-                  to={item.path}
-                  className="px-6 py-2 font-bold text-white transition-all duration-300 bg-red-600 rounded-lg shadow-md hover:bg-red-700 hover:shadow-lg"
-                >
-                  {item.label}
-                </Link>
-              );
-            }
-            return (
+          {navItems.map((item) => (
+            item.label === "Sign In" ? (
+              <Link
+                key={item.label}
+                to={item.path}
+                className="px-6 py-2 font-black text-white bg-[#0A51A1] rounded-lg shadow-md hover:bg-[#ff3333] hover:shadow-lg transition-all duration-300"
+              >
+                {item.label}
+              </Link>
+            ) : (
               <div
                 key={item.label}
                 className="relative"
@@ -148,9 +150,7 @@ const Header: React.FC = () => {
                 <NavLink
                   to={item.path}
                   className={({ isActive }) =>
-                    `${navLinkClass} text-lg text-center ${
-                      isActive ? "underline underline-offset-8" : ""
-                    }`
+                    `${navLinkClass} text-lg text-center ${isActive ? "underline underline-offset-8" : ""}`
                   }
                 >
                   {item.label}
@@ -163,12 +163,12 @@ const Header: React.FC = () => {
                   />
                 )}
               </div>
-            );
-          })}
+            )
+          ))}
         </nav>
         <div className="flex items-center gap-4">
           <div className="hidden lg:block">
-             <ThemeToggleButton />
+            <ThemeToggleButton />
           </div>
           <button
             className="lg:hidden text-white"
@@ -185,42 +185,33 @@ const Header: React.FC = () => {
           </button>
         </div>
       </div>
-
       {isMobileMenuOpen && (
         <motion.nav
-          className="lg:hidden bg-gradient-to-r from-[#0069b4] to-[#004f8a] w-full px-8 py-6"
+          className="lg:hidden bg-gradient-to-r from-[#0A51A1] to-[#ff3333] w-full px-8 py-6"
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: "auto", opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
           transition={{ duration: 0.3 }}
         >
-          {/* UPDATED: Mobile loop also handles the "Sign In" button as a special case */}
-          {navItems.map((item) => {
-            if (item.label === "Sign In") {
-              return (
-                <div key={item.label} className="py-3 text-center">
-                  <Link
-                    to={item.path}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="inline-block px-8 py-3 font-bold text-white transition-all duration-300 bg-red-600 rounded-lg shadow-md hover:bg-red-700 hover:shadow-lg"
-                  >
-                    {item.label}
-                  </Link>
-                </div>
-              );
-            }
-            return (
+          {navItems.map((item) => (
+            item.label === "Sign In" ? (
+              <div key={item.label} className="py-3 text-center">
+                <Link
+                  to={item.path}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="inline-block px-8 py-3 font-black text-white bg-[#ff3333] rounded-lg shadow-md hover:bg-[#e60000] hover:shadow-lg transition-all duration-300"
+                >
+                  {item.label}
+                </Link>
+              </div>
+            ) : (
               <div key={item.label} className="relative py-3 text-center">
                 <NavLink
                   to={item.path}
                   className={({ isActive }) =>
-                    `${navLinkClass} block text-sm ${isActive ? "underline underline-offset-8" : ""}`
+                    `${navLinkClass} block text-base ${isActive ? "underline underline-offset-8" : ""}`
                   }
-                  onClick={() => {
-                    // Close menu, but if it has a dropdown, don't navigate immediately
-                    // This part is complex, for simplicity we close on any click.
-                    setMobileMenuOpen(false);
-                  }}
+                  onClick={() => setMobileMenuOpen(false)}
                 >
                   {item.label}
                 </NavLink>
@@ -230,7 +221,7 @@ const Header: React.FC = () => {
                       <Link
                         key={subItem.label}
                         to={subItem.path}
-                        className="block text-xs font-medium text-white/80 hover:text-white"
+                        className="block text-sm font-bold text-white/80 hover:text-white"
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         {subItem.label}
@@ -239,8 +230,8 @@ const Header: React.FC = () => {
                   </div>
                 )}
               </div>
-            );
-          })}
+            )
+          ))}
           <div className="flex justify-center mt-6">
             <ThemeToggleButton />
           </div>
