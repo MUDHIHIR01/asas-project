@@ -112,6 +112,24 @@ import  EditDiversityInlcusion  from './pages/diversities/EditDiversityInlcusion
 import  ContactUsInfo  from './pages/contact/ContactUsInfo'
 import AddContactUsInfo  from  './pages/contact/AddContactUsInfo'
 import  EditContactUsInfo  from './pages/contact/EditContactUsInfo'
+import EditWhatWeDo  from './pages/whaatwedo/EditWhatWeDo'
+import AddWhatWeDo  from './pages/whaatwedo/AddWhatWeDo'
+import WhatWeDo  from './pages/whaatwedo/WhatWeDo'
+import Wedo  from './pages/whaatwedo/Wedo'
+import AddWedo from './pages/whaatwedo/AddWedo'
+import Editwedo   from './pages/whaatwedo/Editwedo'
+import SubCategoryWeDo  from './pages/whaatwedo/SubCategoryWeDo'
+import AddSubCategoryWeDo  from './pages/whaatwedo/AddSubCategoryWeDo'
+import EditSubCategoryWeDo  from './pages/whaatwedo/EditSubCategoryWeDo'
+import  AddBlogHome  from './pages/blog/AddBlogHome'
+import EditBlogHome  from './pages/blog/EditBlogHome'
+import  BlogHome  from './pages/blog/BlogHome'
+import  Blogs  from './pages/blog/Blogs'
+import  AddBlog  from './pages/blog/AddBlog'
+import  EditBlog  from './pages/blog/EditBlog'
+import EditSubBlog from './pages/blog/EditSubBlog'
+import SubBlogs  from './pages/blog/SubBlogs'
+import AddSubBlog  from './pages/blog/AddSubBlog'
 
 // Define props for ProtectedRoute
 interface ProtectedRouteProps {
@@ -705,6 +723,157 @@ export default function App() {
         </ProtectedRoute>
       }
     />
+
+
+<Route
+  path="/what-we-do"
+  element={
+    <ProtectedRoute>
+      <WhatWeDo />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/add/what-we-do"
+  element={
+    <ProtectedRoute>
+      <AddWhatWeDo />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/edit/what-we-do/:what_we_do_id"
+  element={
+    <ProtectedRoute>
+      <EditWhatWeDo />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/we-do"
+  element={
+    <ProtectedRoute>
+      <Wedo />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/add/we-do"
+  element={
+    <ProtectedRoute>
+      <AddWedo  />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/edit/we-do/:we_do_id"
+  element={
+    <ProtectedRoute>
+      <Editwedo />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/subcategories/we-do"
+  element={
+    <ProtectedRoute>
+      <SubCategoryWeDo />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/subcategories/we-do/add"
+  element={
+    <ProtectedRoute>
+      <AddSubCategoryWeDo />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/subcategories/we-do/edit/:id" 
+  element={
+    <ProtectedRoute>
+      <EditSubCategoryWeDo />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/blog/home"
+  element={
+    <ProtectedRoute>
+      <BlogHome />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/add/blog/home"
+  element={
+    <ProtectedRoute>
+      <AddBlogHome />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/edit/blog-home/:bloghome_id"
+  element={
+    <ProtectedRoute>
+      <EditBlogHome />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/blogs"
+  element={
+    <ProtectedRoute>
+      <Blogs />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/add/blogs"
+  element={
+    <ProtectedRoute>
+      <AddBlog />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/edit/blog/:blog_id"
+  element={
+    <ProtectedRoute>
+      <EditBlog />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/sub-blogs"
+  element={
+    <ProtectedRoute>
+      <SubBlogs />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/add/sub-blog"
+  element={
+    <ProtectedRoute>
+      <AddSubBlog />
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/edit/sub-blog/:subblog_id"
+  element={
+    <ProtectedRoute>
+      <EditSubBlog />
+    </ProtectedRoute>
+  }
+/>
 
             <Route
               path="/calendar"

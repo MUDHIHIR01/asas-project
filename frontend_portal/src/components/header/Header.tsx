@@ -89,9 +89,9 @@ const Header: React.FC = () => {
   ];
 
   const careersMenuItems = [
-    { label: "Vacancies", path: "/careers/vacancies" },
+    { label: "Vacancies", path: "/https://careers.mcl.co.tz/" },
     { label: "What We Do", path: "/careers/what-we-do" },
-    { label: "Life At FT Blog", path: "/careers/life-at-ft-blog" },
+    { label: "Life At MCL Blog", path: "/careers/life-at-ft-blog" },
     { label: "Benefits", path: "/careers/benefits" },
     { label: "Values", path: "/careers/values" },
     { label: "Early Careers", path: "/careers/early-careers" },

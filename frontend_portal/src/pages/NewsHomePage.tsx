@@ -16,14 +16,7 @@ import {
   EnvelopeIcon
 } from "@heroicons/react/24/outline";
 
-// --- Interfaces ---
-interface NewsHomeData {
-  services_home_id: number;
-  heading: string;
-  description: string | null;
-  home_img: string | null;
-}
-
+// --- Interfaces --- (Unchanged)
 interface NewsData {
   news_id: number;
   category: string;
@@ -35,6 +28,7 @@ interface NewsData {
 
 interface SubNewsData {
   subnew_id: number;
+  news_id: number;
   img_url: string | null;
   heading: string;
   description: string;
@@ -44,35 +38,49 @@ interface SubNewsData {
   email_url: string | null;
 }
 
-// --- REFINED: News Home Slideshow ---
-const NewsHomeSlideshow: React.FC = () => {
-  const [data, setData] = useState<NewsHomeData[]>([]);
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const fetchNewsHome = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await axiosInstance.get<NewsHomeData[]>("/api/news-home-slider");
-      setData(Array.isArray(response.data) ? response.data : []);
-    } catch (err: any) {
-      const message = "Failed to fetch news sliders: " + (err.response?.data?.message || err.message);
-      setError(message);
-      toast.error("Error fetching news sliders.");
-    } finally {
-      setLoading(false);
+// --- NEW: Component to hold the slider's CSS animation ---
+// This keeps all code in this one file.
+const SliderStyles = () => (
+  <style jsx global>{`
+    .scroller-container:hover .scroller-inner {
+      animation-play-state: paused;
     }
-  }, []);
 
-  useEffect(() => { fetchNewsHome(); }, [fetchNewsHome]);
+    .scroller-inner {
+      /* Slower animation for larger cards. Increase 120s to make it even slower. */
+      animation: scroll 120s linear infinite;
+    }
+
+    @keyframes scroll {
+      from {
+        transform: translateX(0);
+      }
+      to {
+        /* This moves the content exactly one half of its width, creating a seamless loop */
+        transform: translateX(-50%);
+      }
+    }
+  `}</style>
+);
+
+
+// --- Top Hero Slideshow --- (Unchanged)
+const NewsHomeSlideshow: React.FC<{
+  items: NewsData[];
+  loading: boolean;
+  error: string | null;
+  onRetry: () => void;
+}> = ({ items, loading, error, onRetry }) => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const slideshowItems = items.filter(item => item.news_img);
 
   useEffect(() => {
-    if (data.length <= 1) return;
-    const interval = setInterval(() => setCurrentSlide((prev) => (prev + 1) % data.length), 5000);
+    if (slideshowItems.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slideshowItems.length);
+    }, 5000);
     return () => clearInterval(interval);
-  }, [data.length]);
+  }, [slideshowItems.length]);
 
   const cardVariants = {
     hidden: { opacity: 0, scale: 0.95 },
@@ -89,21 +97,21 @@ const NewsHomeSlideshow: React.FC = () => {
       <div className="flex justify-center items-center min-h-[80vh] bg-gradient-to-br from-indigo-600 to-purple-700">
         <div className="flex items-center space-x-3 text-2xl font-semibold text-white animate-pulse">
           <ArrowPathIcon className="w-8 h-8 animate-spin" />
-          <span>Loading...</span>
+          <span>Loading News...</span>
         </div>
       </div>
     );
   }
 
-  if (error || data.length === 0) {
+  if (error || slideshowItems.length === 0) {
     return (
       <div className="flex flex-col justify-center items-center min-h-[80vh] bg-gradient-to-br from-indigo-600 to-purple-700 p-6">
         <div className="text-rose-300 text-3xl font-bold mb-6 flex items-center space-x-3">
           <InformationCircleIcon className="w-8 h-8" />
-          <span>{error ? "An Error Occurred" : "No Content Found"}</span>
+          <span>{error ? "An Error Occurred" : "No Slideshow Content"}</span>
         </div>
-        <p className="text-gray-200 mb-8 text-lg text-center">{error || "Content for this section could not be loaded."}</p>
-        {error && <button onClick={fetchNewsHome} className="inline-flex items-center px-8 py-3 text-white rounded-full hover:brightness-90 transition-all shadow-lg" style={{ backgroundColor: '#d12814' }}><ArrowPathIcon className="w-5 h-5 mr-2" /> Try Again</button>}
+        <p className="text-gray-200 mb-8 text-lg text-center">{error || "Content for the slideshow could not be loaded."}</p>
+        {error && <button onClick={onRetry} className="inline-flex items-center px-8 py-3 text-white rounded-full hover:brightness-90 transition-all shadow-lg" style={{ backgroundColor: '#d12814' }}><ArrowPathIcon className="w-5 h-5 mr-2" /> Try Again</button>}
       </div>
     );
   }
@@ -113,20 +121,26 @@ const NewsHomeSlideshow: React.FC = () => {
       <AnimatePresence mode="wait">
         <motion.div key={currentSlide} variants={cardVariants} initial="hidden" animate="visible" exit="exit" className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-transparent z-10" />
-          <img src={data[currentSlide].home_img ? `${axiosInstance.defaults.baseURL?.replace(/\/$/, "")}/${data[currentSlide].home_img!.replace(/^\//, "")}` : "https://via.placeholder.com/1200x600?text=Image+Missing"} alt={data[currentSlide].heading} className="w-full h-full object-cover" onError={(e) => { e.currentTarget.src = "https://via.placeholder.com/1200x600?text=Image+Error"; }} loading="lazy" />
+          <img 
+            src={`${axiosInstance.defaults.baseURL?.replace(/\/$/, "")}/${slideshowItems[currentSlide].news_img!.replace(/^\//, "")}`} 
+            alt={slideshowItems[currentSlide].category} 
+            className="w-full h-full object-cover" 
+            onError={(e) => { e.currentTarget.src = "https://via.placeholder.com/1200x600?text=Image+Error"; }} 
+            loading="lazy" 
+          />
         </motion.div>
       </AnimatePresence>
       <div className="relative z-20 flex flex-col justify-center min-h-[80vh] px-4 sm:px-8">
         <div className="max-w-[50%] text-left ml-12">
           <motion.h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-4 tracking-tight" style={{ color: "#d12814", textShadow: "0 4px 12px rgba(0,0,0,0.4)" }} variants={contentVariants} initial="hidden" animate="visible">
-            {data[currentSlide].heading}
+            {slideshowItems[currentSlide].category}
           </motion.h2>
           <motion.p className="text-lg sm:text-xl text-gray-100 mb-8 leading-relaxed font-semibold" variants={contentVariants} initial="hidden" animate="visible" transition={{ delay: 0.2 }}>
-            {data[currentSlide].description || "No description available"}
+            {slideshowItems[currentSlide].description || "No description available"}
           </motion.p>
           <motion.div variants={contentVariants} initial="hidden" animate="visible" transition={{ delay: 0.4 }}>
-            <button onClick={() => setCurrentSlide((p) => (p - 1 + data.length) % data.length)} className="inline-flex items-center p-3 text-white rounded-full transition-all shadow-lg hover:brightness-90" style={{ backgroundColor: '#d12814' }} aria-label="Previous slide"><ChevronLeftIcon className="w-6 h-6" /></button>
-            <button onClick={() => setCurrentSlide((p) => (p + 1) % data.length)} className="ml-4 inline-flex items-center p-3 text-white rounded-full transition-all shadow-lg hover:brightness-90" style={{ backgroundColor: '#d12814' }} aria-label="Next slide"><ChevronRightIcon className="w-6 h-6" /></button>
+            <button onClick={() => setCurrentSlide((p) => (p - 1 + slideshowItems.length) % slideshowItems.length)} className="inline-flex items-center p-3 text-white rounded-full transition-all shadow-lg hover:brightness-90" style={{ backgroundColor: '#d12814' }} aria-label="Previous slide"><ChevronLeftIcon className="w-6 h-6" /></button>
+            <button onClick={() => setCurrentSlide((p) => (p + 1) % slideshowItems.length)} className="ml-4 inline-flex items-center p-3 text-white rounded-full transition-all shadow-lg hover:brightness-90" style={{ backgroundColor: '#d12814' }} aria-label="Next slide"><ChevronRightIcon className="w-6 h-6" /></button>
           </motion.div>
         </div>
       </div>
@@ -134,7 +148,7 @@ const NewsHomeSlideshow: React.FC = () => {
   );
 };
 
-// --- REFINED: Filter Section Component ---
+// --- Filter Section --- (Unchanged)
 const FilterSection: React.FC<{
     month: string;
     year: string;
@@ -168,7 +182,7 @@ const FilterSection: React.FC<{
     );
 };
 
-// --- REFINED: Individual News Card ---
+// --- Vertical News Card (for main grid) --- (Unchanged)
 const NewsCard: React.FC<{ item: NewsData; onViewMore: (newsId: number) => void; }> = ({ item, onViewMore }) => {
     const [hasImageError, setHasImageError] = useState(false);
     const imageUrl = item.news_img ? `${axiosInstance.defaults.baseURL?.replace(/\/$/, "")}/${item.news_img.replace(/^\//, "")}` : null;
@@ -177,9 +191,6 @@ const NewsCard: React.FC<{ item: NewsData; onViewMore: (newsId: number) => void;
     return (
         <motion.div
             className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden flex flex-col transition-shadow duration-300 group"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
             whileHover={{ y: -8, scale: 1.03, boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" }}
         >
             <div className="relative">
@@ -212,16 +223,14 @@ const NewsCard: React.FC<{ item: NewsData; onViewMore: (newsId: number) => void;
     );
 };
 
-// --- REFINED: News Section Component ---
+// --- News Grid Section --- (Unchanged)
 const NewsSection: React.FC<{
     news: NewsData[];
     loading: boolean;
     onViewMore: (newsId: number) => void;
 }> = ({ news, loading, onViewMore }) => {
     if (loading) {
-        return (
-            <div className="text-center py-20"><ArrowPathIcon className="w-8 h-8 mx-auto animate-spin" style={{ color: '#d12814' }} /></div>
-        );
+        return <div className="text-center py-20"><ArrowPathIcon className="w-8 h-8 mx-auto animate-spin" style={{ color: '#d12814' }} /></div>;
     }
 
     if (news.length === 0) {
@@ -240,11 +249,85 @@ const NewsSection: React.FC<{
     );
 };
 
+
+// --- XLarge Horizontal Card for the Infinite Slider --- (Unchanged)
+const HorizontalSliderCard: React.FC<{ item: NewsData; onViewMore: (newsId: number) => void; }> = ({ item, onViewMore }) => {
+    const imageUrl = item.news_img ? `${axiosInstance.defaults.baseURL?.replace(/\/$/, "")}/${item.news_img.replace(/^\//, "")}` : null;
+    const [hasImageError, setHasImageError] = useState(false);
+
+    return (
+        <div className="flex flex-col md:flex-row bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden h-full w-[90vw] md:w-[768px]">
+            <div className="w-full md:w-2/5 flex-shrink-0">
+                 {imageUrl && !hasImageError ? (
+                    <img src={imageUrl} alt={item.category} className="w-full h-56 md:h-full object-cover" onError={() => setHasImageError(true)} />
+                ) : (
+                    <div className="w-full h-56 md:h-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                        <NewspaperIcon className="w-16 h-16 text-gray-300 dark:text-gray-500" />
+                    </div>
+                )}
+            </div>
+            <div className="w-full md:w-3/5 p-6 flex flex-col justify-center">
+                <h3 className="text-2xl font-bold" style={{ color: '#d12814' }}>{item.category}</h3>
+                <p className="mt-3 text-gray-700 dark:text-gray-300 text-base font-semibold line-clamp-4 flex-grow">
+                    {item.description}
+                </p>
+                <div className="mt-5">
+                    <button onClick={() => onViewMore(item.news_id)} className="inline-flex items-center text-sm font-semibold text-white px-5 py-2.5 rounded-md hover:brightness-90 transition-all" style={{ backgroundColor: '#0069b4' }}>
+                        Read More
+                        <ChevronRightIcon className="w-4 h-4 ml-2" />
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// --- REFINED: Infinite Horizontal Slider Section ---
+const AdditionalNewsSlider: React.FC<{
+    news: NewsData[];
+    onViewMore: (newsId: number) => void;
+}> = ({ news, onViewMore }) => {
+    const sliderItems = news.filter(item => item.news_img);
+    const extendedSliderItems = [...sliderItems, ...sliderItems];
+
+    if (sliderItems.length < 1) {
+        return null; 
+    }
+
+    return (
+        <section className="w-full bg-gray-100 dark:bg-gray-800 py-16 mt-20">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="text-center mb-12">
+                     <h3 className="text-3xl font-extrabold sm:text-4xl" style={{ color: '#d12814' }}>
+                       Explore More News Highlights
+                     </h3>
+                </div>
+            </div>
+            <div
+                className="w-full overflow-hidden relative scroller-container"
+                style={{ maskImage: "linear-gradient(to right, transparent, black 5%, black 95%, transparent)" }}
+            >
+                <div className="flex w-max">
+                    <div className="flex scroller-inner">
+                        {extendedSliderItems.map((item, index) => (
+                           <div key={`slide-${index}`} className="mx-8">
+                                <HorizontalSliderCard item={item} onViewMore={onViewMore} />
+                           </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+};
+
+
 // --- Main News Page Component (Container) ---
 const NewsPage: React.FC = () => {
   const [allNews, setAllNews] = useState<NewsData[]>([]);
   const [filteredNews, setFilteredNews] = useState<NewsData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   const [selectedMonth, setSelectedMonth] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
@@ -253,13 +336,15 @@ const NewsPage: React.FC = () => {
   const [selectedNewsItem, setSelectedNewsItem] = useState<NewsData | null>(null);
   const [subNews, setSubNews] = useState<SubNewsData[]>([]);
 
-  // Fetch all news items once
   const fetchNews = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const response = await axiosInstance.get("/api/allNews");
       setAllNews(Array.isArray(response.data.news) ? response.data.news : []);
-    } catch (err) {
+    } catch (err: any) {
+      const message = "Failed to fetch news: " + (err.response?.data?.message || err.message);
+      setError(message);
       toast.error("Error fetching news.");
     } finally {
       setLoading(false);
@@ -268,7 +353,6 @@ const NewsPage: React.FC = () => {
 
   useEffect(() => { fetchNews(); }, [fetchNews]);
 
-  // Filter news whenever the source data or filters change
   useEffect(() => {
     let tempNews = allNews;
     if (selectedYear) {
@@ -280,7 +364,6 @@ const NewsPage: React.FC = () => {
     setFilteredNews(tempNews);
   }, [allNews, selectedMonth, selectedYear]);
 
-  // Handle opening the modal and fetching sub-news
   const handleViewMore = useCallback(async (newsId: number) => {
     const newsItem = allNews.find(n => n.news_id === newsId);
     if (!newsItem) return;
@@ -301,8 +384,11 @@ const NewsPage: React.FC = () => {
 
   return (
     <div className="w-full font-sans bg-gray-50 dark:bg-gray-900">
+      {/* RENDER THE STYLES SO THE ANIMATION IS AVAILABLE */}
+      <SliderStyles />
+      
       <ToastContainer position="top-right" autoClose={3000} newestOnTop closeOnClick pauseOnFocusLoss draggable pauseOnHover theme="colored" />
-      <NewsHomeSlideshow />
+      <NewsHomeSlideshow items={allNews} loading={loading} error={error} onRetry={fetchNews} />
       <main>
         <FilterSection month={selectedMonth} year={selectedYear} onMonthChange={setSelectedMonth} onYearChange={setSelectedYear} />
         <section className="py-16 sm:py-20">
@@ -315,9 +401,14 @@ const NewsPage: React.FC = () => {
                   Stay up to date with our latest announcements, stories, and media.
                 </p>
             </div>
+            {/* The original grid of news cards */}
             <NewsSection news={filteredNews} loading={loading} onViewMore={handleViewMore} />
           </div>
         </section>
+
+        {/* The new, separate, full-width infinite slider */}
+        <AdditionalNewsSlider news={filteredNews} onViewMore={handleViewMore} />
+
       </main>
       <AnimatePresence>
         {isModalOpen && selectedNewsItem && (

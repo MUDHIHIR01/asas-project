@@ -34,8 +34,12 @@ use App\Http\Controllers\API\SubNewsController;
 use App\Http\Controllers\ContactHomeController;
 use App\Http\Controllers\ContactUsController;
 use App\Http\Controllers\API\ContactInfoController;
-
-
+use App\Http\Controllers\WhatWeDoHomeController;
+use App\Http\Controllers\WhatWeDoController;
+use App\Http\Controllers\BlogHomeController;
+use App\Http\Controllers\API\SubcategoryWeDoController;
+use App\Http\Controllers\BlogController;
+use App\Http\Controllers\SubBlogController;
 
 
 // Public Routes
@@ -365,6 +369,62 @@ Route::apiResource('contact-info', ContactInfoController::class);
 Route::get('/contact-us-dropdown', [ContactUsController::class, 'contactDropDown']);
 
 
+
+Route::get('/what-we-do-homes', [WhatWeDoHomeController::class, 'index']);
+Route::get('/what-we-do-homes/slider', [WhatWeDoHomeController::class, 'whatWeDoHomeSlider']);
+Route::get('/what-we-do-homes/{what_we_do_id}', [WhatWeDoHomeController::class, 'show']);
+Route::post('/what-we-do-homes', [WhatWeDoHomeController::class, 'store']);
+Route::post('/what-we-do-homes/{what_we_do_id}', [WhatWeDoHomeController::class, 'update']);
+Route::delete('/what-we-do-homes/{what_we_do_id}', [WhatWeDoHomeController::class, 'destroy']);
+
+
+Route::get('/we-do', [WhatWeDoController::class, 'index']);
+Route::get('/we-do/all', [WhatWeDoController::class, 'allRecords']);
+Route::get('/we-do/{what_we_do_id}', [WhatWeDoController::class, 'show']);
+Route::post('/we-do', [WhatWeDoController::class, 'store']);
+Route::post('/we-do/{what_we_do_id}', [WhatWeDoController::class, 'update']);
+Route::delete('/we-do/{what_we_do_id}', [WhatWeDoController::class, 'destroy']);
+Route::get('/whatwedo/categories', [WhatWeDoController::class, 'fetchAllCategories']);
+
+Route::prefix('subcategories')->group(function () {
+    Route::get('/', [SubcategoryWeDoController::class, 'index']);
+    Route::get('/{subcategoryWeDo}', [SubcategoryWeDoController::class, 'show']);
+    Route::post('/', [SubcategoryWeDoController::class, 'store'])->middleware('auth:sanctum');
+    Route::put('/{subcategoryWeDo}', [SubcategoryWeDoController::class, 'update'])->middleware('auth:sanctum');
+    Route::delete('/{subcategoryWeDo}', [SubcategoryWeDoController::class, 'destroy'])->middleware('auth:sanctum');
+});
     
+
+
+
+
+Route::get('/blog-home-sliders', [BlogHomeController::class, 'index']);
+Route::get('/blog-home-sliders/public', [BlogHomeController::class, 'blogHomeSlider']);
+Route::get('/blog-home-sliders/{blog_home_id}', [BlogHomeController::class, 'show']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/blog-home-sliders', [BlogHomeController::class, 'store']);
+    Route::put('/blog-home-sliders/{blog_home_id}', [BlogHomeController::class, 'update']);
+    Route::delete('/blog-home-sliders/{blog_home_id}', [BlogHomeController::class, 'destroy']);
+});
+
+
+
+
+Route::get('/blogs', [BlogController::class, 'index']);
+Route::get('/blogs/all', [BlogController::class, 'allBlogs']);
+Route::get('/blogs/latest', [BlogController::class, 'latestBlog']);
+Route::get('/blogs/{blog_id}', [BlogController::class, 'show']);
+Route::post('/blogs', [BlogController::class, 'store']);
+Route::put('/blogs/{blog_id}', [BlogController::class, 'update']);
+Route::delete('/blogs/{blog_id}', [BlogController::class, 'destroy']);
+
+
+Route::get('/sub-blogs', [SubBlogController::class, 'index']);
+Route::get('/sub-blogs/all', [SubBlogController::class, 'allSubBlogs']);
+Route::get('/sub-blogs/latest', [SubBlogController::class, 'latestSubBlog']);
+Route::get('/sub-blogs/{sublog_id}', [SubBlogController::class, 'show']);
+ Route::post('/sub-blogs', [SubBlogController::class, 'store']);
+    Route::post('/sub-blogs/{sublog_id}', [SubBlogController::class, 'update']);
+    Route::delete('/sub-blogs/{sublog_id}', [SubBlogController::class, 'destroy']);
 });
 
