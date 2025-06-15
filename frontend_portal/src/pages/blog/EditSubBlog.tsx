@@ -5,6 +5,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 interface FormData {
+  blog_id: string;
   heading: string;
   description: string;
   video_file: File | null;
@@ -12,10 +13,16 @@ interface FormData {
   url_link: string;
 }
 
+interface Blog {
+  blog_id: number;
+  heading: string;
+}
+
 const EditSubBlog = () => {
   const { subblog_id } = useParams<{ subblog_id: string }>();
   const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>({
+    blog_id: '',
     heading: '',
     description: '',
     video_file: null,
@@ -23,6 +30,7 @@ const EditSubBlog = () => {
     url_link: '',
   });
   const [errors, setErrors] = useState<Partial<FormData>>({
+    blog_id: '',
     heading: '',
     description: '',
     video_file: '',
@@ -32,6 +40,7 @@ const EditSubBlog = () => {
   const [loading, setLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fetching, setFetching] = useState(true);
+  const [blogs, setBlogs] = useState<Blog[]>([]);
 
   useEffect(() => {
     const fetchSubBlog = async () => {
@@ -43,8 +52,9 @@ const EditSubBlog = () => {
       setFetching(true);
       try {
         const response = await axiosInstance.get(`/api/sub-blogs/${subblog_id}`);
-        const { heading, description, video_file, image_file, url_link } = response.data.sub_blog;
+        const { blog_id, heading, description, video_file, image_file, url_link } = response.data.sub_blog;
         setFormData({
+          blog_id: blog_id ? String(blog_id) : '',
           heading,
           description: description || '',
           video_file: null,
@@ -59,11 +69,22 @@ const EditSubBlog = () => {
         setFetching(false);
       }
     };
+
+    const fetchBlogs = async () => {
+      try {
+        const response = await axiosInstance.get('/api/blogs-dropdown');
+        setBlogs(response.data);
+      } catch (error: any) {
+        toast.error('Failed to fetch blog options', { position: 'top-right' });
+      }
+    };
+
     fetchSubBlog();
+    fetchBlogs();
   }, [subblog_id, navigate]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -79,13 +100,17 @@ const EditSubBlog = () => {
   const validateForm = (): boolean => {
     const newErrors: Partial<FormData> = {};
 
+    if (!formData.blog_id) {
+      newErrors.blog_id = 'Please select a blog';
+    }
+
     if (!formData.heading.trim()) {
       newErrors.heading = 'Heading is required';
     } else if (formData.heading.length > 255) {
       newErrors.heading = 'Heading must not exceed 255 characters';
     }
 
-    if (formData.description.length > 2000) {
+    if (formData.description.length > 1000) {
       newErrors.description = 'Description must not exceed 1000 characters';
     }
 
@@ -120,6 +145,7 @@ const EditSubBlog = () => {
 
     try {
       const payload = new FormData();
+      payload.append('blog_id', formData.blog_id);
       payload.append('heading', formData.heading);
       payload.append('description', formData.description || '');
       if (formData.video_file) {
@@ -131,6 +157,7 @@ const EditSubBlog = () => {
       if (formData.url_link) {
         payload.append('url_link', formData.url_link);
       }
+      payload.append('_method', 'PUT'); // Laravel API resource expects PUT for updates
 
       const response = await axiosInstance.post(`/api/sub-blogs/${subblog_id}`, payload, {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -162,6 +189,32 @@ const EditSubBlog = () => {
           Edit Sub-Blog
         </h2>
         <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label htmlFor="blog_id" className="block text-sm font-medium text-gray-700">
+              Blog *
+            </label>
+            <select
+              id="blog_id"
+              name="blog_id"
+              value={formData.blog_id}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 sm:p-3 lg:p-4 text-sm sm:text-base"
+              aria-invalid={!!errors.blog_id}
+              aria-describedby={errors.blog_id ? 'blog_id-error' : undefined}
+            >
+              <option value="">Select a Blog</option>
+              {blogs.map((blog) => (
+                <option key={blog.blog_id} value={blog.blog_id}>
+                  {blog.heading}
+                </option>
+              ))}
+            </select>
+            {errors.blog_id && (
+              <p id="blog_id-error" className="mt-1 text-sm text-red-500">
+                {errors.blog_id}
+              </p>
+            )}
+          </div>
           <div>
             <label htmlFor="heading" className="block text-sm font-medium text-gray-700">
               Heading *

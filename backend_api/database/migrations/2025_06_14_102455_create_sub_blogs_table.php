@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::create('sub_blogs', function (Blueprint $table) {
             $table->id('sublog_id');
             $table->string('heading', 255);
+            $table->integer('blog_id', );
             $table->text('description')->nullable();
             $table->string('video_file')->nullable();
             $table->string('image_file')->nullable();

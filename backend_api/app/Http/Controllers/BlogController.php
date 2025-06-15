@@ -61,6 +61,23 @@ class BlogController extends Controller
         }
     }
 
+    
+   public function blogsDropDown()
+{
+    try {
+        // The query is perfect, no changes needed here.
+        $blogs = Blog::select('blog_id', 'heading')->orderBy('blog_id', 'desc')->get();
+        
+        // The key change is here: return the data as a JSON response.
+        return response()->json($blogs);
+
+    } catch (Exception $e) {
+        \Log::error('Error fetching blog records for dropdown: ' . $e->getMessage());
+        // Also return an error in JSON format with an appropriate HTTP status code.
+        return response()->json(['error' => 'Failed to fetch blog records.'], 500);
+    }
+}
+
     /**
      * Store a newly created blog record.
      */

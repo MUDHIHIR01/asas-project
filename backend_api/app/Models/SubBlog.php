@@ -13,9 +13,17 @@ class SubBlog extends Model
 
     protected $fillable = [
         'heading',
+        'blog_id',
         'description',
         'video_file',
         'image_file',
         'url_link',
     ];
+
+
+    
+     public function blog()
+    {
+        return $this->belongsTo(Blog::class, 'blog_id','blog_id');
+    }
 }

@@ -154,6 +154,13 @@ import EditEarycareHome from './pages/earycareer/EditEarycareHome'
 import EarlyCareers from './pages/earycareer/EarlyCareers';
 import AddEarlyCareer from './pages/earycareer/AddEarlyCareer';
 import EditEarlyCareer from './pages/earycareer/EditEarlyCareer';
+import  WhaatWeDoLayout  from './pages/WhaatWeDoLayout'
+import  LifeAtBlogLayout  from './pages/LifeAtBlogLayout'
+import BenefitiesLayout  from './pages/BenefitiesLayout'
+import  ValuesLayout from  './pages/ValuesLayout'
+import  EaryCareerLayout from './pages/EaryCareerLayout'
+import  StayCoonnectedLayout  from './pages/StayCoonnectedLayout'
+
 
 // Define props for ProtectedRoute
 interface ProtectedRouteProps {
@@ -1233,6 +1240,14 @@ export default function App() {
          <Route path="/company/services" element={<  ServicesLayout />} />
           <Route path="/company/news" element={<  NewsHomeLayout />} />
           <Route path="/company/contact-us" element={<  ContactLayout />} />
+           <Route path="/careers/what-we-do" element={< WhaatWeDoLayout />} />
+            <Route path="/careers/mcl-blog" element={< LifeAtBlogLayout />} />
+             <Route path="/careers/benefits" element={< BenefitiesLayout />} />
+              <Route path="/careers/values" element={< ValuesLayout />} />
+              <Route path="/careers/early-careers" element={< EaryCareerLayout />} />
+               <Route path="/careers/stay-connected" element={< StayCoonnectedLayout />} />
+              
+                
           <Route path="/sign-in" element={<SignIn />} />
           <Route path="/sign-up" element={<SignUp />} />
           <Route path="/reset-password" element={<ResetPass />} />

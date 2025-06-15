@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 interface FormData {
+  blog_id: string;
   heading: string;
   description: string;
   video_file: File | null;
@@ -12,9 +13,15 @@ interface FormData {
   url_link: string;
 }
 
+interface Blog {
+  blog_id: number;
+  heading: string;
+}
+
 const AddSubBlog = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<FormData>({
+    blog_id: '',
     heading: '',
     description: '',
     video_file: null,
@@ -22,6 +29,7 @@ const AddSubBlog = () => {
     url_link: '',
   });
   const [errors, setErrors] = useState<Partial<FormData>>({
+    blog_id: '',
     heading: '',
     description: '',
     video_file: '',
@@ -30,9 +38,22 @@ const AddSubBlog = () => {
   });
   const [loading, setLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [blogs, setBlogs] = useState<Blog[]>([]);
+
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        const response = await axiosInstance.get('/api/blogs-dropdown');
+        setBlogs(response.data);
+      } catch (error: any) {
+        toast.error('Failed to fetch blog options', { position: 'top-right' });
+      }
+    };
+    fetchBlogs();
+  }, []);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -47,6 +68,10 @@ const AddSubBlog = () => {
 
   const validateForm = (): boolean => {
     const newErrors: Partial<FormData> = {};
+
+    if (!formData.blog_id) {
+      newErrors.blog_id = 'Please select a blog';
+    }
 
     if (!formData.heading.trim()) {
       newErrors.heading = 'Heading is required';
@@ -89,6 +114,7 @@ const AddSubBlog = () => {
 
     try {
       const payload = new FormData();
+      payload.append('blog_id', formData.blog_id);
       payload.append('heading', formData.heading);
       payload.append('description', formData.description || '');
       if (formData.video_file) {
@@ -127,6 +153,32 @@ const AddSubBlog = () => {
           Create Sub-Blog
         </h2>
         <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label htmlFor="blog_id" className="block text-sm font-medium text-gray-700">
+              Blog *
+            </label>
+            <select
+              id="blog_id"
+              name="blog_id"
+              value={formData.blog_id}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 sm:p-3 lg:p-4 text-sm sm:text-base"
+              aria-invalid={!!errors.blog_id}
+              aria-describedby={errors.blog_id ? 'blog_id-error' : undefined}
+            >
+              <option value="">Select a Blog</option>
+              {blogs.map((blog) => (
+                <option key={blog.blog_id} value={blog.blog_id}>
+                  {blog.heading}
+                </option>
+              ))}
+            </select>
+            {errors.blog_id && (
+              <p id="blog_id-error" className="mt-1 text-sm text-red-500">
+                {errors.blog_id}
+              </p>
+            )}
+          </div>
           <div>
             <label htmlFor="heading" className="block text-sm font-medium text-gray-700">
               Heading *

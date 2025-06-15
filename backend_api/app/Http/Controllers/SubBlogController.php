@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\SubBlog;
+use App\Models\Blog; // This was already included, which is great.
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Exception;
@@ -11,16 +12,17 @@ class SubBlogController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:sanctum')->except(['index', 'show', 'latestSubBlog', 'allSubBlogs']);
+        $this->middleware('auth:sanctum')->except(['index', 'show', 'latestSubBlog', 'allSubBlogs', 'blogsDropDown']);
     }
 
     /**
-     * Display a listing of sub-blog records.
+     * Display a listing of sub-blog records with their associated blog.
      */
     public function index()
     {
         try {
-            $subBlogs = SubBlog::orderBy('sublog_id', 'desc')->get();
+            // MODIFIED: Eager load the 'blog' relationship to include parent blog data.
+            $subBlogs = SubBlog::with('blog')->orderBy('sublog_id', 'desc')->get();
             return response()->json(['sub_blogs' => $subBlogs], 200);
         } catch (Exception $e) {
             \Log::error('Error fetching sub-blog records: ' . $e->getMessage());
@@ -29,12 +31,13 @@ class SubBlogController extends Controller
     }
 
     /**
-     * Display all sub-blog records.
+     * Display all sub-blog records with their associated blog.
      */
     public function allSubBlogs()
     {
         try {
-            $subBlogs = SubBlog::orderBy('sublog_id', 'desc')->get();
+            // MODIFIED: Eager load the 'blog' relationship.
+            $subBlogs = SubBlog::with('blog')->orderBy('sublog_id', 'desc')->get();
             return response()->json(['sub_blogs' => $subBlogs], 200);
         } catch (Exception $e) {
             \Log::error('Error fetching sub-blog records: ' . $e->getMessage());
@@ -43,12 +46,13 @@ class SubBlogController extends Controller
     }
 
     /**
-     * Display the latest sub-blog record based on created_at.
+     * Display the latest sub-blog record with its associated blog.
      */
     public function latestSubBlog()
     {
         try {
-            $latestSubBlog = SubBlog::orderBy('created_at', 'desc')->first();
+            // MODIFIED: Eager load the 'blog' relationship.
+            $latestSubBlog = SubBlog::with('blog')->orderBy('created_at', 'desc')->first();
             
             if (!$latestSubBlog) {
                 return response()->json(['message' => 'No sub-blog record found'], 404);
@@ -69,6 +73,8 @@ class SubBlogController extends Controller
         \Log::info('Sub-blog store request data: ', $request->all());
 
         $validator = Validator::make($request->all(), [
+            // MODIFIED: Added blog_id to validation. It's required and must exist in the blogs table.
+            'blog_id' => 'required|integer|exists:blogs,blog_id',
             'heading' => 'required|string|max:255',
             'description' => 'nullable|string',
             'video_file' => 'nullable|file|mimetypes:video/*|max:40240',
@@ -113,8 +119,13 @@ class SubBlogController extends Controller
                 $data['image_file'] = 'uploads/sub_blog_images/' . $imageName;
                 \Log::info('Image file uploaded: ' . $data['image_file']);
             }
-
+            
+            // The validated data now includes blog_id, so it will be saved automatically.
             $subBlog = SubBlog::create($data);
+            
+            // MODIFIED: Load the blog relationship on the newly created record before returning.
+            $subBlog->load('blog');
+            
             return response()->json(['message' => 'Sub-blog record created successfully', 'sub_blog' => $subBlog], 201);
         } catch (Exception $e) {
             \Log::error('Error creating sub-blog record: ' . $e->getMessage());
@@ -123,11 +134,12 @@ class SubBlogController extends Controller
     }
 
     /**
-     * Display the specified sub-blog record.
+     * Display the specified sub-blog record with its associated blog.
      */
     public function show($sublog_id)
     {
-        $subBlog = SubBlog::find($sublog_id);
+        // MODIFIED: Eager load the 'blog' relationship.
+        $subBlog = SubBlog::with('blog')->find($sublog_id);
 
         if (!$subBlog) {
             return response()->json(['message' => 'Sub-blog record not found'], 404);
@@ -149,6 +161,8 @@ class SubBlogController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
+            // MODIFIED: Added blog_id. 'sometimes' means it's only validated if present.
+            'blog_id' => 'sometimes|integer|exists:blogs,blog_id',
             'heading' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'video_file' => 'nullable|file|mimetypes:video/*|max:10240',
@@ -182,8 +196,6 @@ class SubBlogController extends Controller
                 $video->move($uploadPath, $videoName);
                 $data['video_file'] = 'uploads/sub_blog_videos/' . $videoName;
                 \Log::info('New video file uploaded: ' . $data['video_file']);
-            } else {
-                $data['video_file'] = $subBlog->video_file;
             }
 
             // Handle image_file upload
@@ -204,12 +216,12 @@ class SubBlogController extends Controller
                 $image->move($uploadPath, $imageName);
                 $data['image_file'] = 'uploads/sub_blog_images/' . $imageName;
                 \Log::info('New image file uploaded: ' . $data['image_file']);
-            } else {
-                $data['image_file'] = $subBlog->image_file;
             }
 
             $subBlog->fill($data)->save();
-            return response()->json(['message' => 'Sub-blog record updated successfully.', 'sub_blog' => $subBlog->fresh()], 200);
+            
+            // MODIFIED: Use fresh() with the relationship to get the updated model with its blog.
+            return response()->json(['message' => 'Sub-blog record updated successfully.', 'sub_blog' => $subBlog->fresh('blog')], 200);
         } catch (Exception $e) {
             \Log::error('Error updating sub-blog record: ' . $e->getMessage());
             return response()->json(['error' => 'Failed to update sub-blog record.', 'details' => $e->getMessage()], 500);
@@ -246,4 +258,6 @@ class SubBlogController extends Controller
             return response()->json(['error' => 'Failed to delete sub-blog record.', 'details' => $e->getMessage()], 500);
         }
     }
+
+    
 }

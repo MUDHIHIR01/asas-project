@@ -10,6 +10,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 interface SubBlogData {
   sublog_id: number;
+  blog_id: number;
   heading: string;
   description: string | null;
   video_file: string | null;
@@ -17,6 +18,10 @@ interface SubBlogData {
   url_link: string | null;
   created_at: string;
   updated_at?: string;
+  blog?: {
+    blog_id: number;
+    heading: string;
+  };
 }
 
 interface ActionButtonsProps {
@@ -161,6 +166,13 @@ export default function SubBlogs() {
           return <span>{originalIndex + 1}</span>;
         },
       },
+      {
+        Header: 'Blog',
+        accessor: 'blog.heading',
+        Cell: ({ value }: { value: string | null }) => (
+          <span>{value || 'No Blog'}</span>
+        ),
+      },
       { Header: 'Heading', accessor: 'heading' },
       {
         Header: 'Description',
@@ -263,9 +275,10 @@ export default function SubBlogs() {
     const doc = new jsPDF();
     doc.text('Sub-Blog Entries', 20, 10);
     autoTable(doc, {
-      head: [['#', 'Heading', 'Description', 'URL Link', 'Created At']],
+      head: [['#', 'Blog', 'Heading', 'Description', 'URL Link', 'Created At']],
       body: data.map((row, index) => [
         index + 1,
+        row.blog?.heading || 'No Blog',
         row.heading,
         row.description || 'No Description',
         row.url_link || 'No Link',
@@ -280,6 +293,7 @@ export default function SubBlogs() {
     const worksheet = XLSX.utils.json_to_sheet(
       data.map((row, index) => ({
         '#': index + 1,
+        Blog: row.blog?.heading || 'No Blog',
         Heading: row.heading,
         Description: row.description || 'No Description',
         'URL Link': row.url_link || 'No Link',

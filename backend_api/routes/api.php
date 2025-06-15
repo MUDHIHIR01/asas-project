@@ -96,8 +96,20 @@ Route::get('/leadershipHomeSlider', [LeadershipHomeController::class, 'leadershi
          Route::get('/subNews', [SubNewsController::class, 'subNews']);
           Route::get('/allContactUs', [ContactUsController::class, 'allContactUs']);
           Route::get('/contactInfo', [ContactInfoController::class, 'contactInfo']);
-         
-         
+          Route::get('/what-we-do-homes/slider', [WhatWeDoHomeController::class, 'whatWeDoHomeSlider']);
+           Route::get('/we-do/all', [WhatWeDoController::class, 'allRecords']);
+          Route::get('/blog-home-sliders/public', [BlogHomeController::class, 'blogHomeSlider']);
+          Route::get('/blogs/all', [BlogController::class, 'allBlogs']);
+          Route::get('/sub-blogs/all', [SubBlogController::class, 'allSubBlogs']);
+          Route::get('/benefities-home-slider', [BenefitiesHomeController::class, 'benefitiesHomeSlider']);
+          Route::get('/benefits/all', [BenefitsController::class, 'allBenefits']);
+          Route::get('/values-home/slider', [ValuesHomeController::class, 'valuesHomeSlider']);
+          Route::get('/values/all', [ValuesController::class, 'allValues']);
+       Route::get('/earlycareer/sliders', [EarycareHomeController::class, 'earycareHomeSlider'])->name('earycare-home.sliders');
+       Route::get('/early-careers/all', [EarlyCareersController::class, 'allEarlyCareers']);
+        Route::get('/stayconnected/sliders', [StayConnectedHomeController::class, 'stayConnectedHomeSlider'])->name('stay-connected-home.sliders');
+      Route::get('/stay-connected/all', [StayConnectedController::class, 'allStayConnected']);
+
         
 
 // Protected Routes
@@ -378,7 +390,6 @@ Route::get('/contact-us-dropdown', [ContactUsController::class, 'contactDropDown
 
 
 Route::get('/what-we-do-homes', [WhatWeDoHomeController::class, 'index']);
-Route::get('/what-we-do-homes/slider', [WhatWeDoHomeController::class, 'whatWeDoHomeSlider']);
 Route::get('/what-we-do-homes/{what_we_do_id}', [WhatWeDoHomeController::class, 'show']);
 Route::post('/what-we-do-homes', [WhatWeDoHomeController::class, 'store']);
 Route::post('/what-we-do-homes/{what_we_do_id}', [WhatWeDoHomeController::class, 'update']);
@@ -386,7 +397,6 @@ Route::delete('/what-we-do-homes/{what_we_do_id}', [WhatWeDoHomeController::clas
 
 
 Route::get('/we-do', [WhatWeDoController::class, 'index']);
-Route::get('/we-do/all', [WhatWeDoController::class, 'allRecords']);
 Route::get('/we-do/{what_we_do_id}', [WhatWeDoController::class, 'show']);
 Route::post('/we-do', [WhatWeDoController::class, 'store']);
 Route::post('/we-do/{what_we_do_id}', [WhatWeDoController::class, 'update']);
@@ -406,7 +416,6 @@ Route::prefix('subcategories')->group(function () {
 
 
 Route::get('/blog-home-sliders', [BlogHomeController::class, 'index']);
-Route::get('/blog-home-sliders/public', [BlogHomeController::class, 'blogHomeSlider']);
 Route::get('/blog-home-sliders/{blog_home_id}', [BlogHomeController::class, 'show']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/blog-home-sliders', [BlogHomeController::class, 'store']);
@@ -418,16 +427,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 Route::get('/blogs', [BlogController::class, 'index']);
-Route::get('/blogs/all', [BlogController::class, 'allBlogs']);
 Route::get('/blogs/latest', [BlogController::class, 'latestBlog']);
 Route::get('/blogs/{blog_id}', [BlogController::class, 'show']);
 Route::post('/blogs', [BlogController::class, 'store']);
 Route::put('/blogs/{blog_id}', [BlogController::class, 'update']);
 Route::delete('/blogs/{blog_id}', [BlogController::class, 'destroy']);
-
+  Route::get('/blogs-dropdown', [BlogController::class, 'blogsDropDown']);
 
 Route::get('/sub-blogs', [SubBlogController::class, 'index']);
-Route::get('/sub-blogs/all', [SubBlogController::class, 'allSubBlogs']);
 Route::get('/sub-blogs/latest', [SubBlogController::class, 'latestSubBlog']);
 Route::get('/sub-blogs/{sublog_id}', [SubBlogController::class, 'show']);
  Route::post('/sub-blogs', [SubBlogController::class, 'store']);
@@ -437,7 +444,6 @@ Route::get('/sub-blogs/{sublog_id}', [SubBlogController::class, 'show']);
 
 
 Route::get('/benefities-home', [BenefitiesHomeController::class, 'index']);
-Route::get('/benefities-home-slider', [BenefitiesHomeController::class, 'benefitiesHomeSlider']);
 Route::get('/benefities-home/{benefit_home_id}', [BenefitiesHomeController::class, 'show']);
 Route::post('/benefities-home', [BenefitiesHomeController::class, 'store']);
 Route::put('/benefities-home/{benefit_home_id}', [BenefitiesHomeController::class, 'update']);
@@ -445,7 +451,6 @@ Route::delete('/benefities-home/{benefit_home_id}', [BenefitiesHomeController::c
 
 
 Route::get('/benefits', [BenefitsController::class, 'index']);
-Route::get('/benefits/all', [BenefitsController::class, 'allBenefits']);
 Route::get('/benefits/{benefit_id}', [BenefitsController::class, 'show']);
 Route::post('/benefits', [BenefitsController::class, 'store']);
 Route::post('/benefits/{benefit_id}', [BenefitsController::class, 'update']);
@@ -453,15 +458,15 @@ Route::delete('/benefits/{benefit_id}', [BenefitsController::class, 'destroy']);
 
 
 Route::get('/values-home', [ValuesHomeController::class, 'index']);
-Route::get('/values-home/slider', [ValuesHomeController::class, 'valuesHomeSlider']);
+
 Route::get('/values-home/{values_home_id}', [ValuesHomeController::class, 'show']);
 Route::post('/values-home', [ValuesHomeController::class, 'store']);
 Route::put('/values-home/{values_home_id}', [ValuesHomeController::class, 'update']);
 Route::delete('/values-home/{values_home_id}', [ValuesHomeController::class, 'destroy']);
 
 
+
 Route::get('/values', [ValuesController::class, 'index']);
-Route::get('/values/all', [ValuesController::class, 'allValues']);
 Route::get('/values/{value_id}', [ValuesController::class, 'show']);
 Route::post('/values', [ValuesController::class, 'store']);
 Route::post('/values/{value_id}', [ValuesController::class, 'update']);
@@ -470,7 +475,6 @@ Route::delete('/values/{value_id}', [ValuesController::class, 'destroy']);
 
 Route::prefix('stay-connected-home')->group(function () {
     Route::get('/', [StayConnectedHomeController::class, 'index'])->name('stay-connected-home.index');
-    Route::get('/sliders', [StayConnectedHomeController::class, 'stayConnectedHomeSlider'])->name('stay-connected-home.sliders');
     Route::get('/{stay_connected_id}', [StayConnectedHomeController::class, 'show'])->name('stay-connected-home.show');
     Route::post('/', [StayConnectedHomeController::class, 'store'])->name('stay-connected-home.store');
     Route::put('/{stay_connected_id}', [StayConnectedHomeController::class, 'update'])->name('stay-connected-home.update');
@@ -481,7 +485,7 @@ Route::prefix('stay-connected-home')->group(function () {
 
 
 Route::get('/stay-connected', [StayConnectedController::class, 'index']);
-Route::get('/stay-connected/all', [StayConnectedController::class, 'allStayConnected']);
+
 Route::get('/stay-connected/{stay_connected_id}', [StayConnectedController::class, 'show']);
 Route::post('/stay-connected', [StayConnectedController::class, 'store']);
 Route::post('/stay-connected/{stay_connected_id}', [StayConnectedController::class, 'update']);
@@ -490,15 +494,13 @@ Route::delete('/stay-connected/{stay_connected_id}', [StayConnectedController::c
 
 Route::prefix('earycare-home')->group(function () {
     Route::get('/', [EarycareHomeController::class, 'index'])->name('earycare-home.index');
-    Route::get('/sliders', [EarycareHomeController::class, 'earycareHomeSlider'])->name('earycare-home.sliders');
     Route::get('/{earycare_id}', [EarycareHomeController::class, 'show'])->name('earycare-home.show');
     Route::post('/', [EarycareHomeController::class, 'store'])->name('earycare-home.store');
     Route::put('/{earycare_id}', [EarycareHomeController::class, 'update'])->name('earycare-home.update');
     Route::delete('/{earycare_id}', [EarycareHomeController::class, 'destroy'])->name('earycare-home.destroy');
 });
 
-Route::get('/early-careers', [EarlyCareersController::class, 'index']);
-Route::get('/early-careers/all', [EarlyCareersController::class, 'allEarlyCareers']);
+ Route::get('/early-careers', [EarlyCareersController::class, 'index']);
 Route::get('/early-careers/{early_career_id}', [EarlyCareersController::class, 'show']);
 Route::post('/early-careers', [EarlyCareersController::class, 'store']);
 Route::post('/early-careers/{early_career_id}', [EarlyCareersController::class, 'update']);

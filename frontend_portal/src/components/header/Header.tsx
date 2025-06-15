@@ -93,18 +93,18 @@ const Header: React.FC = () => {
   const careersMenuItems: NavItem[] = [
     { label: "Vacancies", path: "https://careers.mcl.co.tz/" },
     { label: "What We Do", path: "/careers/what-we-do" },
-    { label: "Life At MCL Blog", path: "/careers/life-at-ft-blog" },
+    { label: "Life At MCL Blog", path: "/careers/mcl-blog" },
     { label: "Benefits", path: "/careers/benefits" },
     { label: "Values", path: "/careers/values" },
     { label: "Early Careers", path: "/careers/early-careers" },
-    { label: "Join Our Talent Community", path: "/careers/join-our-talent-community" },
+    { label: "Join Our Talent Community", path: "/careers/stay-connected" },
   ];
 
   const navItems: NavItem[] = [
     { label: "About Us", path: "/" },
     { label: "Company", path: "/company/home", dropdown: companyMenuItems },
     { label: "Services", path: "/company/services" },
-    { label: "Careers", path: "/careers", dropdown: careersMenuItems },
+    { label: "Careers", path: "/careers/what-we-do", dropdown: careersMenuItems },
     { label: "News", path: "/company/news" },
     { label: "Contact", path: "/company/contact-us" },
     { label: "Sign In", path: "/sign-in" },
